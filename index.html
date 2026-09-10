@@ -273,6 +273,13 @@
       font-weight: 600;
     }
 
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      align-items: center;
+    }
+
     @media (max-width: 560px) {
       .site-header,
       .site-footer,
@@ -350,7 +357,10 @@
   <div class="site-footer-wrap">
     <footer class="site-footer">
       <p>Built and collected by Brian Coords.</p>
-      <a href="https://www.briancoords.com/">Back to briancoords.com</a>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="https://spacefast.com/">Powered by Spacefast</a>
+        <a href="https://www.briancoords.com/">Back to briancoords.com</a>
+      </nav>
     </footer>
   </div>
 </body>
