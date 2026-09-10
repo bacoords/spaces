@@ -1,0 +1,1446 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#71439a">
+  <meta name="description" content="Build a practical migration plan from WooCommerce Storefront to a modern block theme.">
+  <title>Storefront Exit Map — Plan your move to blocks</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f5f7;
+      --ink: #201725;
+      --muted: #6f6474;
+      --card: #ffffff;
+      --purple: #71439a;
+      --purple-dark: #2a1934;
+      --purple-soft: #eee4f5;
+      --lime: #dcf36d;
+      --border: #ded7e1;
+      --built-in: #42a675;
+      --compose: #9c6ac9;
+      --plugin: #e5a83c;
+      --developer: #d15d70;
+      --sans: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    summary,
+    label {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-underline-offset: 0.16em;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--lime);
+      outline-offset: 3px;
+    }
+
+    ::selection {
+      background: var(--lime);
+      color: var(--ink);
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 12px;
+      left: 12px;
+      padding: 8px 12px;
+      background: var(--ink);
+      color: white;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .site-header {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      min-height: 72px;
+      padding: 0 clamp(20px, 4vw, 64px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--purple);
+      color: white;
+      font-weight: 800;
+      letter-spacing: -0.08em;
+      box-shadow: 0 7px 18px rgb(83 42 114 / 18%);
+    }
+
+    .brand-copy {
+      display: grid;
+      line-height: 1.2;
+    }
+
+    .brand-copy strong {
+      font-size: 14px;
+    }
+
+    .brand-copy small {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .header-link {
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .header-link:hover {
+      text-decoration: underline;
+    }
+
+    .intro {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: clamp(56px, 8vw, 108px) clamp(20px, 4vw, 64px) clamp(44px, 6vw, 72px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.5fr);
+      gap: clamp(40px, 8vw, 120px);
+      align-items: end;
+    }
+
+    .eyebrow,
+    .step-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--purple);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      padding: 5px 10px;
+      border: 1px solid #cfc3d5;
+      border-radius: 999px;
+      background: rgb(255 255 255 / 68%);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 22px 0 20px;
+      font-family: var(--serif);
+      font-size: clamp(54px, 7.7vw, 108px);
+      font-weight: 400;
+      letter-spacing: -0.065em;
+      line-height: 0.88;
+    }
+
+    .intro-copy > p {
+      max-width: 750px;
+      margin-bottom: 0;
+      color: #5f5365;
+      font-size: clamp(17px, 1.55vw, 22px);
+      line-height: 1.55;
+    }
+
+    .privacy-note {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 13px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgb(255 255 255 / 68%);
+    }
+
+    .privacy-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-weight: 900;
+    }
+
+    .privacy-note p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .privacy-note strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--ink);
+    }
+
+    .planner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 4vw, 64px) 110px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.65fr);
+      align-items: start;
+    }
+
+    .audit-panel,
+    .summary-panel {
+      min-width: 0;
+      overflow: hidden;
+      box-shadow: 0 28px 70px rgb(46 26 58 / 8%);
+    }
+
+    .audit-panel {
+      border: 1px solid var(--border);
+      border-right: 0;
+      border-radius: 24px 0 0 24px;
+      background: white;
+    }
+
+    .panel-heading {
+      padding: 30px 32px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid #ece7ee;
+    }
+
+    .panel-heading h2,
+    .plan-heading h2,
+    .sequence-copy h2 {
+      margin: 8px 0 0;
+      font-size: clamp(25px, 2.5vw, 38px);
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+    }
+
+    .button {
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 1px solid #cfc5d3;
+      border-radius: 10px;
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .button:hover {
+      border-color: var(--purple);
+      background: #fbf8fd;
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button.primary {
+      border-color: var(--purple);
+      background: var(--purple);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: #5f3485;
+    }
+
+    .button.ghost {
+      border-color: transparent;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .preset-bar {
+      padding: 16px 32px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #ece7ee;
+      background: #faf8fb;
+    }
+
+    .preset-bar > span {
+      margin-right: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .preset-bar .button {
+      min-height: 32px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .groups {
+      padding: 0 24px 12px;
+    }
+
+    .feature-group {
+      border-bottom: 1px solid #ece7ee;
+    }
+
+    .feature-group:last-child {
+      border-bottom: 0;
+    }
+
+    .feature-group summary {
+      padding: 20px 8px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 14px;
+      align-items: center;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .feature-group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .feature-group summary::after {
+      content: "+";
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: var(--purple);
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .feature-group[open] summary::after {
+      content: "−";
+    }
+
+    .group-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .group-copy strong {
+      font-size: 15px;
+    }
+
+    .group-copy small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 450;
+    }
+
+    .group-count {
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .feature-list {
+      padding: 0 8px 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .feature-option {
+      position: relative;
+      min-height: 72px;
+      padding: 13px 34px 13px 13px;
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 11px;
+      align-items: start;
+      border: 1px solid #e8e2ea;
+      border-radius: 13px;
+      background: white;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .feature-option:hover {
+      border-color: #c8b5d3;
+      transform: translateY(-1px);
+    }
+
+    .feature-option:has(input:checked) {
+      border-color: #a981c2;
+      background: #fbf8fd;
+    }
+
+    .feature-option input {
+      width: 17px;
+      height: 17px;
+      margin: 2px 0 0;
+      accent-color: var(--purple);
+    }
+
+    .feature-copy {
+      display: grid;
+      gap: 4px;
+      line-height: 1.35;
+    }
+
+    .feature-copy strong {
+      font-size: 13px;
+    }
+
+    .feature-copy small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .route-dot {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--route-color);
+    }
+
+    .summary-panel {
+      position: sticky;
+      top: 90px;
+      min-height: 610px;
+      padding: 32px;
+      border-radius: 0 24px 24px 0;
+      background: var(--purple-dark);
+      color: white;
+    }
+
+    .summary-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .summary-panel .step-label {
+      color: #d8b6f2;
+    }
+
+    .complexity {
+      padding: 4px 9px;
+      border: 1px solid rgb(255 255 255 / 25%);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .summary-panel h2 {
+      margin: 24px 0 10px;
+      font-size: clamp(30px, 3vw, 46px);
+      letter-spacing: -0.05em;
+      line-height: 1.02;
+    }
+
+    .summary-lede {
+      margin-bottom: 28px;
+      color: #d8ccd9;
+      font-size: 15px;
+    }
+
+    .melt-card {
+      padding: 18px;
+      border: 1px solid rgb(255 255 255 / 12%);
+      border-radius: 15px;
+      background: rgb(255 255 255 / 7%);
+    }
+
+    .melt-labels,
+    .melt-caption,
+    .effort-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .melt-labels {
+      color: #c8bdcb;
+      font-size: 11px;
+    }
+
+    .melt-bar {
+      height: 10px;
+      margin: 12px 0 14px;
+      display: flex;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgb(255 255 255 / 10%);
+    }
+
+    .melt-segment {
+      height: 100%;
+      background: var(--route-color);
+    }
+
+    .melt-caption strong {
+      color: var(--lime);
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 400;
+    }
+
+    .melt-caption span {
+      max-width: 170px;
+      color: #c8bdcb;
+      font-size: 11px;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .route-counts {
+      margin: 22px 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .route-count {
+      padding: 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 11px;
+      background: rgb(255 255 255 / 7%);
+    }
+
+    .route-icon {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: var(--route-color);
+      color: #1d1122;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .route-count > span:last-child {
+      display: grid;
+      line-height: 1.2;
+    }
+
+    .route-count strong {
+      font-size: 16px;
+    }
+
+    .route-count small {
+      color: #c8bdcb;
+      font-size: 10px;
+    }
+
+    .route-built-in {
+      --route-color: var(--built-in);
+    }
+
+    .route-compose {
+      --route-color: var(--compose);
+    }
+
+    .route-plugin {
+      --route-color: var(--plugin);
+    }
+
+    .route-developer {
+      --route-color: var(--developer);
+    }
+
+    .effort-row {
+      margin: 20px 0;
+      padding: 14px 0;
+      border-top: 1px solid rgb(255 255 255 / 12%);
+      border-bottom: 1px solid rgb(255 255 255 / 12%);
+      color: #c8bdcb;
+      font-size: 12px;
+    }
+
+    .effort-row strong {
+      color: white;
+      font-size: 14px;
+    }
+
+    .summary-panel .button.primary {
+      width: 100%;
+      min-height: 46px;
+      border-color: var(--lime);
+      background: var(--lime);
+      color: var(--ink);
+    }
+
+    .summary-panel .button.primary:hover {
+      background: #e4f78a;
+    }
+
+    .plan {
+      padding: clamp(76px, 9vw, 128px) clamp(20px, 4vw, 64px);
+      background: white;
+    }
+
+    .plan-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .plan-heading {
+      margin-bottom: 34px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .plan-heading p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .plan-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .notice {
+      margin: -14px 0 24px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .plan-columns {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .route-column {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--route-color);
+      border-radius: 14px;
+      background: #fcfbfc;
+    }
+
+    .route-column-heading {
+      min-height: 130px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      border-bottom: 1px solid #ece7ee;
+    }
+
+    .route-column-heading h3 {
+      margin: 2px 0 5px;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .route-column-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .route-column-heading > strong {
+      font-family: var(--serif);
+      font-size: 25px;
+      font-weight: 400;
+    }
+
+    .route-items {
+      padding: 8px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .route-item {
+      padding: 14px;
+      border: 1px solid #ece7ee;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .route-item h4 {
+      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .route-item p,
+    .destination,
+    .gap-note {
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .route-item p {
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+
+    .destination {
+      color: var(--purple);
+      font-weight: 700;
+    }
+
+    .gap-note {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 7px;
+      background: #fff4db;
+      color: #6f4c0a;
+    }
+
+    .gap-note strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .route-empty {
+      padding: 20px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .sequence {
+      padding: clamp(76px, 9vw, 126px) clamp(20px, 4vw, 64px);
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(340px, 1fr);
+      gap: clamp(48px, 9vw, 130px);
+      background: var(--purple-dark);
+      color: white;
+    }
+
+    .sequence > * {
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .sequence-copy {
+      justify-self: end;
+    }
+
+    .sequence .step-label {
+      color: #d8b6f2;
+    }
+
+    .sequence-copy p {
+      max-width: 480px;
+      margin: 18px 0 0;
+      color: #c8bdcb;
+    }
+
+    .sequence-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .sequence-list li {
+      padding: 16px 0;
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 16px;
+      border-bottom: 1px solid rgb(255 255 255 / 12%);
+    }
+
+    .sequence-list li:first-child {
+      padding-top: 0;
+    }
+
+    .sequence-list > li > span {
+      color: var(--lime);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .sequence-list strong {
+      font-size: 14px;
+    }
+
+    .sequence-list p {
+      margin: 4px 0 0;
+      color: #c8bdcb;
+      font-size: 12px;
+    }
+
+    .disclaimer {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 52px clamp(20px, 4vw, 64px);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .disclaimer-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-weight: 900;
+    }
+
+    .disclaimer h2 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .disclaimer p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .disclaimer a {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    footer {
+      min-height: 76px;
+      padding: 20px clamp(20px, 4vw, 64px);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px 28px;
+      border-top: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    footer strong {
+      color: var(--ink);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    footer a {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1040px) {
+      .planner {
+        grid-template-columns: 1fr;
+      }
+
+      .audit-panel {
+        border-right: 1px solid var(--border);
+        border-radius: 22px 22px 0 0;
+      }
+
+      .summary-panel {
+        position: relative;
+        top: auto;
+        min-height: 0;
+        border-radius: 0 0 22px 22px;
+      }
+
+      .plan-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .intro,
+      .sequence {
+        grid-template-columns: 1fr;
+      }
+
+      .intro {
+        gap: 30px;
+      }
+
+      .feature-list,
+      .plan-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .plan-heading,
+      .disclaimer {
+        align-items: flex-start;
+        grid-template-columns: 1fr;
+      }
+
+      .plan-heading {
+        flex-direction: column;
+      }
+
+      .plan-actions {
+        justify-content: flex-start;
+      }
+
+      .route-column-heading {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .site-header {
+        min-height: 64px;
+      }
+
+      .brand-copy small {
+        display: none;
+      }
+
+      .header-link {
+        font-size: 12px;
+      }
+
+      .panel-heading,
+      .preset-bar,
+      .summary-panel {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .panel-heading {
+        flex-direction: column;
+      }
+
+      .groups {
+        padding-inline: 12px;
+      }
+    }
+
+    @media print {
+      .skip-link,
+      .site-header,
+      .intro,
+      .planner,
+      .plan-actions,
+      .notice,
+      .sequence,
+      .disclaimer,
+      footer {
+        display: none !important;
+      }
+
+      .plan {
+        padding: 0;
+      }
+
+      .plan-columns {
+        display: block;
+      }
+
+      .route-column {
+        margin-bottom: 16px;
+        break-inside: avoid;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#audit">Skip to planner</a>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Storefront Exit Map home">
+      <span class="brand-mark" aria-hidden="true">S↗</span>
+      <span class="brand-copy">
+        <strong>Storefront Exit Map</strong>
+        <small>Plan the move to blocks</small>
+      </span>
+    </a>
+    <a class="header-link" href="#how-it-works">How it works →</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="intro-copy">
+        <span class="eyebrow">✦ Interactive planning guide</span>
+        <h1>Keep the store.<br>Lose the legacy.</h1>
+        <p>Tell us what your Storefront site uses. We’ll map each piece to its block-theme route and show what can disappear, what you’ll rebuild, and where you still need help.</p>
+      </div>
+      <aside class="privacy-note">
+        <span class="privacy-icon" aria-hidden="true">✓</span>
+        <p><strong>Nothing leaves your browser.</strong>This planner does not connect to or inspect your store.</p>
+      </aside>
+    </section>
+
+    <section class="planner" id="audit" aria-label="Migration planner">
+      <div class="audit-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="step-label">01 · Audit your Storefront setup</span>
+            <h2>What does your site use today?</h2>
+          </div>
+          <button class="button ghost" type="button" data-action="clear">↻ Clear</button>
+        </div>
+        <div class="preset-bar" aria-label="Starting point presets">
+          <span>Start with:</span>
+          <button class="button" type="button" data-preset="typical">Typical store</button>
+          <button class="button" type="button" data-preset="extension-heavy">Extension-heavy</button>
+          <button class="button" type="button" data-preset="custom">Custom child theme</button>
+        </div>
+        <div class="groups" id="feature-groups"></div>
+      </div>
+
+      <aside class="summary-panel" aria-live="polite">
+        <div class="summary-topline">
+          <span class="step-label">02 · Your route forward</span>
+          <span class="complexity" id="complexity">Simple</span>
+        </div>
+        <div id="summary-content"></div>
+      </aside>
+    </section>
+
+    <section class="plan" id="plan">
+      <div class="plan-inner">
+        <div class="plan-heading">
+          <div>
+            <span class="step-label">03 · Your migration plan</span>
+            <h2>A practical route from old to new</h2>
+            <p id="plan-count"></p>
+          </div>
+          <div class="plan-actions">
+            <button class="button" type="button" data-action="copy-link">Copy link</button>
+            <button class="button" type="button" data-action="copy-plan">Copy Markdown</button>
+            <button class="button primary" type="button" data-action="download">Download plan</button>
+          </div>
+        </div>
+        <p class="notice" id="notice" role="status" hidden></p>
+        <div class="plan-columns" id="plan-columns"></div>
+      </div>
+    </section>
+
+    <section class="sequence" id="how-it-works">
+      <div class="sequence-copy">
+        <span class="step-label">Recommended sequence</span>
+        <h2>Rebuild the system,<br>then rebuild the pages.</h2>
+        <p>Start with the decisions that cascade through the whole store. Save one-off page adjustments for later.</p>
+      </div>
+      <ol class="sequence-list">
+        <li><span>01</span><div><strong>Back up and stage</strong><p>Take a full backup and do the entire migration on a staging copy.</p></div></li>
+        <li><span>02</span><div><strong>Set the visual foundation</strong><p>Recreate colors and typography in Global Styles first.</p></div></li>
+        <li><span>03</span><div><strong>Rebuild shared regions</strong><p>Move the header, footer, navigation, and sidebars into template parts.</p></div></li>
+        <li><span>04</span><div><strong>Compose commerce templates</strong><p>Adjust the catalog and product templates, then the homepage.</p></div></li>
+        <li><span>05</span><div><strong>Test the buying journey</strong><p>Check products, variations, cart, checkout, account, and mobile behavior.</p></div></li>
+        <li><span>06</span><div><strong>Cut over and monitor</strong><p>Switch the live theme only after staging passes the complete checklist.</p></div></li>
+      </ol>
+    </section>
+
+    <section class="disclaimer">
+      <span class="disclaimer-icon" aria-hidden="true">!</span>
+      <div>
+        <h2>This is a planner, not an automated migration.</h2>
+        <p>Classic themes and block themes store design decisions differently. Always back up first, test in staging, and review custom PHP case by case. Storefront remains usable while you plan.</p>
+      </div>
+      <a href="#audit">Back to audit ↑</a>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Storefront Exit Map</strong>
+    <span>Built from the Storefront → block-theme feature mapping guide.</span>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../">All spaces</a>
+      <a href="https://spacefast.com/">Powered by Spacefast</a>
+    </nav>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const routeOrder = ['built-in', 'compose', 'plugin', 'developer'];
+      const routeMeta = {
+        'built-in': { label: 'Already built in', short: 'Built in', description: 'WordPress or WooCommerce blocks now cover this job.', icon: '✓' },
+        compose: { label: 'Rebuild visually', short: 'Compose', description: 'Recreate it with blocks, patterns, templates, or Global Styles.', icon: '◫' },
+        plugin: { label: 'Plugin still needed', short: 'Plugin', description: 'Block themes do not yet provide a complete native equivalent.', icon: '+' },
+        developer: { label: 'Developer work', short: 'Refactor', description: 'Move behavior out of the theme and into a durable implementation.', icon: '</>' }
+      };
+
+      const groups = [
+        { id: 'appearance', label: 'Appearance & layout', description: 'Customizer choices, menus, sidebars, and reusable theme regions.' },
+        { id: 'extensions', label: 'Storefront extensions', description: 'Official extensions that may be absorbed, rebuilt, or replaced.' },
+        { id: 'templates', label: 'Commerce templates', description: 'Shop, product, cart, checkout, and account layouts.' },
+        { id: 'custom-code', label: 'Child theme & custom code', description: 'Hooks, markup, business logic, and bespoke components.' }
+      ];
+
+      const features = [
+        { id: 'colors-type', group: 'appearance', name: 'Colors and typography', legacy: 'Storefront Customizer color and type settings', route: 'built-in', destination: 'Site Editor → Styles', action: 'Recreate the palette and typography in Global Styles before touching individual templates.' },
+        { id: 'header', group: 'appearance', name: 'Custom header layout', legacy: 'Header settings, logo, menus, and header widget region', route: 'compose', destination: 'Site Editor → Template parts → Header', action: 'Assemble the Site Logo, Site Title, Navigation, Cover, and Group blocks into one reusable header.' },
+        { id: 'footer', group: 'appearance', name: 'Footer and widget columns', legacy: 'Footer Customizer settings and one-to-four widget areas', route: 'compose', destination: 'Site Editor → Template parts → Footer', action: 'Replace widget regions with Columns and the blocks that hold the same content.' },
+        { id: 'navigation', group: 'appearance', name: 'Primary and mobile navigation', legacy: 'Primary Navigation and Handheld Menu', route: 'built-in', destination: 'Navigation block', action: 'Use one responsive Navigation block; a separate handheld menu is usually unnecessary.' },
+        { id: 'sidebar', group: 'appearance', name: 'Sidebar layout', legacy: 'Global left/right sidebar toggle and Sidebar widget area', route: 'compose', destination: 'Page or post template', action: 'Add a Columns block to the templates that need a sidebar and place content blocks in the secondary column.' },
+        { id: 'background-image', group: 'appearance', name: 'Site-wide background image', legacy: 'Customizer background image', route: 'developer', destination: 'Cover block or targeted CSS', action: 'Prefer a Cover block where the image is meaningful; use carefully scoped CSS only when it truly belongs on the page body.' },
+        { id: 'powerpack', group: 'extensions', name: 'Storefront Powerpack', legacy: 'Preset headers, footers, sticky nav, and color schemes', route: 'compose', destination: 'Template parts, patterns, and Global Styles', action: 'Build the chosen header and footer directly, then save reusable arrangements as patterns or template parts.' },
+        { id: 'homepage-content', group: 'extensions', name: 'Storefront Homepage Content', legacy: 'Featured, recent, sale, best-selling, and category sections', route: 'built-in', destination: 'Product Collection and Product Categories blocks', action: 'Recreate each section with a filtered Product Collection block and reorder the blocks directly.' },
+        { id: 'product-hero', group: 'extensions', name: 'Storefront Product Hero', legacy: 'Automatically populated product hero', route: 'compose', destination: 'Hero pattern or Cover block', action: 'Insert a hero pattern and add the product image, copy, price, and link manually.', note: 'The automatic product-data connection is a genuine gap today.' },
+        { id: 'blog-customizer', group: 'extensions', name: 'Storefront Blog Customizer', legacy: 'Grid/list layouts, meta visibility, excerpts, and featured images', route: 'built-in', destination: 'Query Loop and Post Template blocks', action: 'Choose the Query Loop layout and add or remove post blocks to control the presentation.' },
+        { id: 'reviews', group: 'extensions', name: 'Storefront Reviews', legacy: 'Rotating testimonial slider', route: 'plugin', destination: 'Testimonial plugin or static quote pattern', action: 'Use a blockquote pattern for static testimonials; retain a focused plugin if rotation is essential.' },
+        { id: 'parallax', group: 'extensions', name: 'Storefront Parallax Hero', legacy: 'Parallax background image', route: 'built-in', destination: 'Cover block → Fixed background', action: 'Use the Cover block fixed-background setting and test the fallback on mobile browsers.' },
+        { id: 'product-sharing', group: 'extensions', name: 'Storefront Product Sharing', legacy: 'Social sharing buttons on product pages', route: 'plugin', destination: 'Jetpack Sharing or another sharing plugin', action: 'Install only the sharing capability you need and place it in the Single Product template.' },
+        { id: 'woo-customizer', group: 'extensions', name: 'Storefront WooCommerce Customizer', legacy: 'WooCommerce-specific color controls', route: 'built-in', destination: 'Global Styles → Blocks', action: 'Style WooCommerce blocks and button variations globally, then override only exceptional blocks.' },
+        { id: 'product-pagination', group: 'extensions', name: 'Storefront Product Pagination', legacy: 'Previous and next product links', route: 'plugin', destination: 'Post Navigation block or a focused WooCommerce plugin', action: 'Test Post Navigation against the desired product order; use a plugin if catalog-aware navigation is required.' },
+        { id: 'site-logo', group: 'extensions', name: 'Storefront Site Logo', legacy: 'Logo width and layout controls', route: 'built-in', destination: 'Site Logo block', action: 'Set the logo width and link behavior directly on the Site Logo block.' },
+        { id: 'footer-bar', group: 'extensions', name: 'Storefront Footer Bar', legacy: 'Sticky mobile footer actions', route: 'compose', destination: 'Footer template part', action: 'Compose the actions in a sticky Group block and hide it at larger breakpoints.' },
+        { id: 'designer', group: 'extensions', name: 'Storefront Designer', legacy: 'Advanced type controls and custom fonts', route: 'built-in', destination: 'Block typography controls and theme.json', action: 'Use block-level controls for spacing and transforms; register any additional font families in theme.json.' },
+        { id: 'sticky-payment', group: 'extensions', name: 'Storefront Sticky Payment', legacy: 'Sticky add-to-cart bar', route: 'compose', destination: 'Single Product template', action: 'Wrap the Add to Cart block in a sticky Group and validate that it does not obscure content on small screens.' },
+        { id: 'mega-menus', group: 'extensions', name: 'Storefront Mega Menus', legacy: 'Multi-column navigation dropdowns', route: 'plugin', destination: 'A block-compatible mega menu plugin', action: 'Keep a mega menu plugin when the catalog hierarchy cannot fit a standard Navigation block submenu.', note: 'Native Navigation submenus do not provide a full mega-menu layout.' },
+        { id: 'product-grid', group: 'extensions', name: 'Storefront Product Grid Customizer', legacy: 'Grid columns, rows, gaps, and products per page', route: 'built-in', destination: 'Product Collection block → Layout', action: 'Set columns, spacing, and pagination directly on the Product Collection block.' },
+        { id: 'cart-checkout', group: 'templates', name: 'Cart and checkout layouts', legacy: 'Storefront cart and checkout template overrides', route: 'built-in', destination: 'Cart and Checkout blocks', action: 'Start from the block-based templates and test the complete purchase flow in staging.' },
+        { id: 'catalog', group: 'templates', name: 'Product catalog and archives', legacy: 'Shop, category, and tag archive layouts', route: 'built-in', destination: 'Product Catalog template + Product Collection', action: 'Configure filters, sorting, columns, and pagination within the Product Catalog template.' },
+        { id: 'single-product', group: 'templates', name: 'Single product layout', legacy: 'Storefront WooCommerce template hooks and overrides', route: 'compose', destination: 'Single Product template', action: 'Arrange product blocks in the template and verify every product type, gallery, variation, and add-to-cart state.' },
+        { id: 'account', group: 'templates', name: 'My Account presentation', legacy: 'Storefront account-area styling', route: 'built-in', destination: 'My Account templates in the Site Editor', action: 'Review account navigation and content templates, then align them with the new Global Styles.' },
+        { id: 'markup-hooks', group: 'custom-code', name: 'Hooks that insert markup', legacy: 'storefront_before_header, storefront_after_content, and similar actions', route: 'compose', destination: 'Template parts, templates, or patterns', action: 'Place the equivalent blocks in the exact template location instead of recreating the PHP hook.' },
+        { id: 'reusable-sections', group: 'custom-code', name: 'Reusable visual sections', legacy: 'PHP partials or child-theme markup', route: 'compose', destination: 'Synced patterns or theme patterns', action: 'Convert repeated visual sections into patterns that editors can place and maintain safely.' },
+        { id: 'business-logic', group: 'custom-code', name: 'Business logic in the child theme', legacy: 'PHP that changes data, pricing, behavior, or integrations', route: 'developer', destination: 'Site-specific plugin', action: 'Extract behavior into a plugin so it survives this and future theme changes; add focused tests before cutover.' },
+        { id: 'bespoke-components', group: 'custom-code', name: 'Bespoke structural components', legacy: 'Custom PHP components with editor-facing variants', route: 'developer', destination: 'Custom block or block variation', action: 'Model the component as a block variation when core blocks are sufficient, or build a custom block when they are not.' }
+      ];
+
+      const presets = {
+        typical: ['colors-type', 'header', 'footer', 'navigation', 'homepage-content', 'site-logo', 'product-grid', 'cart-checkout', 'catalog', 'single-product'],
+        'extension-heavy': features.filter((feature) => feature.group === 'extensions').map((feature) => feature.id),
+        custom: ['colors-type', 'header', 'footer', 'navigation', 'single-product', 'markup-hooks', 'reusable-sections', 'business-logic', 'bespoke-components']
+      };
+
+      const selected = new Set(presets.typical);
+      const groupRoot = document.querySelector('#feature-groups');
+      const summaryRoot = document.querySelector('#summary-content');
+      const planRoot = document.querySelector('#plan-columns');
+      const planCount = document.querySelector('#plan-count');
+      const complexityLabel = document.querySelector('#complexity');
+      const notice = document.querySelector('#notice');
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function loadHash() {
+        const match = window.location.hash.match(/^#setup=(.*)$/);
+        if (!match) return;
+        try {
+          const ids = decodeURIComponent(match[1]).split(',').filter((id) => features.some((feature) => feature.id === id));
+          if (ids.length) {
+            selected.clear();
+            ids.forEach((id) => selected.add(id));
+          }
+        } catch {
+          // Keep the default selection when a shared hash is malformed.
+        }
+      }
+
+      function renderGroups() {
+        groupRoot.innerHTML = groups.map((group, index) => {
+          const items = features.filter((feature) => feature.group === group.id);
+          const count = items.filter((feature) => selected.has(feature.id)).length;
+          return `
+            <details class="feature-group" data-group="${group.id}" ${index < 2 ? 'open' : ''}>
+              <summary>
+                <span class="group-copy"><strong>${escapeHtml(group.label)}</strong><small>${escapeHtml(group.description)}</small></span>
+                <span class="group-count">${count}/${items.length}</span>
+              </summary>
+              <div class="feature-list">
+                ${items.map((feature) => `
+                  <label class="feature-option route-${feature.route}">
+                    <input type="checkbox" value="${feature.id}" ${selected.has(feature.id) ? 'checked' : ''}>
+                    <span class="feature-copy"><strong>${escapeHtml(feature.name)}</strong><small>${escapeHtml(feature.legacy)}</small></span>
+                    <span class="route-dot" title="${escapeHtml(routeMeta[feature.route].label)}" aria-hidden="true"></span>
+                  </label>
+                `).join('')}
+              </div>
+            </details>
+          `;
+        }).join('');
+      }
+
+      function getState() {
+        const chosen = features.filter((feature) => selected.has(feature.id));
+        const counts = Object.fromEntries(routeOrder.map((route) => [route, chosen.filter((feature) => feature.route === route).length]));
+        const workScore = counts.compose + counts.plugin + counts.developer * 3;
+        const complexity = counts.developer > 1 || workScore > 9 ? 'Custom' : workScore > 4 ? 'Moderate' : 'Simple';
+        const estimate = complexity === 'Simple' ? '1–3 days' : complexity === 'Moderate' ? '3–7 days' : '1–2 weeks';
+        const blockReady = counts['built-in'] + counts.compose;
+        const simplification = chosen.length ? Math.round((counts['built-in'] / chosen.length) * 100) : 0;
+        return { chosen, counts, complexity, estimate, blockReady, simplification };
+      }
+
+      function renderSummary(state) {
+        complexityLabel.textContent = state.complexity;
+        if (!state.chosen.length) {
+          summaryRoot.innerHTML = `
+            <h2>Select a few features to build your plan.</h2>
+            <p class="summary-lede">Choose only what your current store actually uses. The map updates immediately.</p>
+          `;
+          return;
+        }
+
+        summaryRoot.innerHTML = `
+          <h2>${state.counts['built-in']} of ${state.chosen.length} choices are already built in.</h2>
+          <p class="summary-lede">${state.blockReady} can move to blocks or the Site Editor without adding another plugin.</p>
+          <div class="melt-card">
+            <div class="melt-labels"><span>Storefront setup</span><span>Block-theme plan</span></div>
+            <div class="melt-bar" aria-label="Migration route distribution">
+              ${routeOrder.map((route) => state.counts[route] ? `<span class="melt-segment route-${route}" style="width:${(state.counts[route] / state.chosen.length) * 100}%"></span>` : '').join('')}
+            </div>
+            <div class="melt-caption"><strong>${state.simplification}%</strong><span>of selected features are absorbed by core blocks</span></div>
+          </div>
+          <div class="route-counts">
+            ${routeOrder.map((route) => `<div class="route-count route-${route}"><span class="route-icon">${escapeHtml(routeMeta[route].icon)}</span><span><strong>${state.counts[route]}</strong><small>${routeMeta[route].short}</small></span></div>`).join('')}
+          </div>
+          <div class="effort-row"><span>Rough planning range</span><strong>${state.estimate}</strong></div>
+          <button class="button primary" type="button" data-action="show-plan">See my migration plan →</button>
+        `;
+      }
+
+      function renderPlan(state) {
+        planCount.textContent = `${state.chosen.length} selected feature${state.chosen.length === 1 ? '' : 's'}, organized by the work they require.`;
+        planRoot.innerHTML = routeOrder.map((route) => {
+          const meta = routeMeta[route];
+          const matches = state.chosen.filter((feature) => feature.route === route);
+          return `
+            <section class="route-column route-${route}">
+              <div class="route-column-heading">
+                <span class="route-icon">${escapeHtml(meta.icon)}</span>
+                <div><h3>${escapeHtml(meta.label)}</h3><p>${escapeHtml(meta.description)}</p></div>
+                <strong>${matches.length}</strong>
+              </div>
+              <div class="route-items">
+                ${matches.length ? matches.map((feature) => `
+                  <article class="route-item">
+                    <h4>${escapeHtml(feature.name)}</h4>
+                    <p>${escapeHtml(feature.action)}</p>
+                    <div class="destination">→ ${escapeHtml(feature.destination)}</div>
+                    ${feature.note ? `<div class="gap-note"><strong>Known gap</strong>${escapeHtml(feature.note)}</div>` : ''}
+                  </article>
+                `).join('') : '<div class="route-empty">Nothing from your audit lands here.</div>'}
+              </div>
+            </section>
+          `;
+        }).join('');
+      }
+
+      function planAsMarkdown(state) {
+        const lines = [
+          '# Storefront migration plan',
+          '',
+          `**Complexity:** ${state.complexity}`,
+          `**Planning range:** ${state.estimate}`,
+          '',
+          '> Planning aid only. Back up the site and test the migration in staging before switching production.',
+          ''
+        ];
+
+        routeOrder.forEach((route) => {
+          const matches = state.chosen.filter((feature) => feature.route === route);
+          if (!matches.length) return;
+          lines.push(`## ${routeMeta[route].label}`, '');
+          matches.forEach((feature) => {
+            lines.push(`- [ ] **${feature.name}** — ${feature.action}`, `  - Destination: ${feature.destination}`);
+            if (feature.note) lines.push(`  - Note: ${feature.note}`);
+          });
+          lines.push('');
+        });
+
+        lines.push(
+          '## Cutover checklist',
+          '',
+          '- [ ] Take a full backup.',
+          '- [ ] Build and test in staging.',
+          '- [ ] Verify product, cart, checkout, and account flows.',
+          '- [ ] Review mobile layouts and navigation.',
+          '- [ ] Switch production and monitor for issues.'
+        );
+        return lines.join('\n');
+      }
+
+      function showNotice(message) {
+        notice.textContent = message;
+        notice.hidden = false;
+      }
+
+      function syncGroups() {
+        groupRoot.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+          input.checked = selected.has(input.value);
+        });
+        groups.forEach((group) => {
+          const details = groupRoot.querySelector(`[data-group="${group.id}"]`);
+          const count = features.filter((feature) => feature.group === group.id && selected.has(feature.id)).length;
+          details.querySelector('.group-count').textContent = `${count}/${features.filter((feature) => feature.group === group.id).length}`;
+        });
+      }
+
+      function update() {
+        const state = getState();
+        syncGroups();
+        renderSummary(state);
+        renderPlan(state);
+        notice.hidden = true;
+      }
+
+      async function copyText(text, success) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showNotice(success);
+        } catch {
+          showNotice('Copying was blocked by the browser. Use the download instead.');
+        }
+      }
+
+      document.addEventListener('change', (event) => {
+        if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'checkbox') return;
+        if (event.target.checked) selected.add(event.target.value);
+        else selected.delete(event.target.value);
+        update();
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const button = event.target.closest('button');
+        if (!button) return;
+
+        const preset = button.dataset.preset;
+        if (preset && presets[preset]) {
+          selected.clear();
+          presets[preset].forEach((id) => selected.add(id));
+          update();
+          showNotice(`${button.textContent.trim()} starting point applied.`);
+          return;
+        }
+
+        const action = button.dataset.action;
+        if (action === 'clear') {
+          selected.clear();
+          update();
+          showNotice('Selections cleared.');
+        }
+        if (action === 'show-plan') document.querySelector('#plan').scrollIntoView({ behavior: 'smooth' });
+        if (action === 'copy-link') {
+          const hash = `#setup=${encodeURIComponent(Array.from(selected).join(','))}`;
+          window.history.replaceState(null, '', hash);
+          copyText(window.location.href, 'Shareable plan link copied.');
+        }
+        if (action === 'copy-plan') copyText(planAsMarkdown(getState()), 'Migration plan copied as Markdown.');
+        if (action === 'download') {
+          const blob = new Blob([planAsMarkdown(getState())], { type: 'text/markdown;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'storefront-migration-plan.md';
+          link.click();
+          URL.revokeObjectURL(url);
+          showNotice('Migration plan downloaded.');
+        }
+      });
+
+      loadHash();
+      renderGroups();
+      update();
+    })();
+  </script>
+</body>
+</html>
