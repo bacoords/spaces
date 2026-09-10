@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Small projects, demos, and experiments by Brian Coords.">
+  <title>Spaces — Brian Coords</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --base: #fafafa;
+      --main: #1a1a1a;
+      --primary: #003353;
+      --secondary: #636381;
+      --tertiary: #f2f2f0;
+      --border: #dadee3;
+      --accent: #e4e1fe;
+      --content: 740px;
+      --wide: 1260px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--base);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--base);
+      color: var(--main);
+      font-family: var(--font-sans);
+      font-size: 1.0625rem;
+      line-height: 1.7;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-underline-offset: 0.16em;
+      text-decoration-thickness: 1px;
+    }
+
+    a:focus-visible {
+      outline: 3px solid var(--primary);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: 12px;
+      left: 12px;
+      padding: 8px 12px;
+      background: var(--main);
+      color: var(--base);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .site-header,
+    .site-footer {
+      width: min(calc(100% - 48px), var(--wide));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      padding-block: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+
+    .brand {
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .home-link {
+      color: var(--secondary);
+      font-weight: 550;
+      text-decoration-color: var(--border);
+      transition: color 160ms ease, text-decoration-color 160ms ease;
+    }
+
+    .home-link:hover {
+      color: var(--primary);
+      text-decoration-color: currentColor;
+    }
+
+    main {
+      width: min(calc(100% - 48px), var(--content));
+      margin-inline: auto;
+      flex: 1;
+    }
+
+    .intro {
+      padding-block: clamp(72px, 12vw, 132px) clamp(64px, 9vw, 96px);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--secondary);
+      font-size: 0.8125rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 11ch;
+      margin-bottom: 22px;
+      font-size: clamp(2.75rem, 8vw, 3.75rem);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+    }
+
+    .intro-copy {
+      max-width: 34rem;
+      margin-bottom: 0;
+      color: var(--secondary);
+      font-size: clamp(1.0625rem, 2vw, 1.165rem);
+    }
+
+    .intro-copy a {
+      color: var(--main);
+      font-weight: 600;
+    }
+
+    .directory {
+      padding-bottom: clamp(80px, 12vw, 140px);
+    }
+
+    .directory-heading {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(1.75rem, 5vw, 2.35rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .count {
+      margin: 0;
+      color: var(--secondary);
+      font-size: 0.875rem;
+    }
+
+    .space-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .space-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .space-link {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 28px;
+      align-items: center;
+      padding: 30px 18px 30px 0;
+      text-decoration: none;
+      transition: background-color 160ms ease, padding 160ms ease;
+    }
+
+    .space-link:hover {
+      padding-left: 18px;
+      padding-right: 18px;
+      background: var(--tertiary);
+    }
+
+    .space-link:focus-visible {
+      outline-offset: 2px;
+    }
+
+    h3 {
+      margin-bottom: 6px;
+      font-size: clamp(1.25rem, 3vw, 1.5rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .space-description {
+      max-width: 34rem;
+      margin-bottom: 10px;
+      color: var(--secondary);
+      font-size: 0.9375rem;
+      line-height: 1.55;
+    }
+
+    .space-path {
+      color: var(--primary);
+      font-size: 0.8125rem;
+      font-weight: 650;
+    }
+
+    .arrow {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--primary);
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .space-link:hover .arrow {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--base);
+      transform: translate(2px, -2px);
+    }
+
+    .site-footer-wrap {
+      border-top: 1px solid var(--border);
+    }
+
+    .site-footer {
+      padding-block: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--secondary);
+      font-size: 0.8125rem;
+      line-height: 1.5;
+    }
+
+    .site-footer p {
+      margin-bottom: 0;
+    }
+
+    .site-footer a {
+      color: var(--main);
+      font-weight: 600;
+    }
+
+    @media (max-width: 560px) {
+      .site-header,
+      .site-footer,
+      main {
+        width: min(calc(100% - 32px), var(--content));
+      }
+
+      .intro {
+        padding-block: 64px 72px;
+      }
+
+      .space-link {
+        gap: 16px;
+        padding-block: 24px;
+      }
+
+      .space-link:hover {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#directory">Skip to directory</a>
+
+  <header class="site-header">
+    <a class="brand" href="https://www.briancoords.com/">Brian Coords</a>
+    <a class="home-link" href="https://www.briancoords.com/">briancoords.com ↗</a>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">A directory of small things</p>
+      <h1 id="page-title">Spaces</h1>
+      <p class="intro-copy">Projects, prototypes, and useful little experiments from <a href="https://www.briancoords.com/">Brian Coords</a>.</p>
+    </section>
+
+    <section class="directory" id="directory" aria-labelledby="directory-title">
+      <div class="directory-heading">
+        <h2 id="directory-title">Directory</h2>
+        <p class="count">1 space</p>
+      </div>
+
+      <ol class="space-list">
+        <li class="space-item">
+          <a class="space-link" href="./code-editor-typing-demo/">
+            <div>
+              <h3>Code Editor Typing Demo</h3>
+              <p class="space-description">Configure and play a polished code-typing animation inside a responsive editor window.</p>
+              <span class="space-path">/code-editor-typing-demo/</span>
+            </div>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      </ol>
+    </section>
+  </main>
+
+  <div class="site-footer-wrap">
+    <footer class="site-footer">
+      <p>Built and collected by Brian Coords.</p>
+      <a href="https://www.briancoords.com/">Back to briancoords.com</a>
+    </footer>
+  </div>
+</body>
+</html>
