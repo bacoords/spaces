@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code Editor Typing Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --canvas: #FAF7F3;
+      --window: #0f141d;
+      --titlebar: #121923;
+      --sidebar: #0d121a;
+      --activity: #0a0f16;
+      --editor: #101722;
+      --editor-raised: #151d29;
+      --line: #202a38;
+      --line-soft: #18212d;
+      --text: #d7dee9;
+      --muted: #758194;
+      --faint: #485466;
+      --teal: #61d6c2;
+      --teal-soft: rgba(97, 214, 194, .12);
+      --blue: #8ab4ff;
+      --purple: #c9a8ff;
+      --orange: #f5b97c;
+      --green: #a6d189;
+      --pink: #e7a6c7;
+      --shadow: rgba(0, 0, 0, .42);
+      --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+      --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: var(--ui);
+      overflow: auto;
+    }
+
+    button, select, textarea { font: inherit; }
+
+    button { color: inherit; }
+
+    button:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+
+    .stage {
+      min-height: 100vh;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .demo-layout {
+      position: relative;
+      width: min(1600px, 100%);
+      height: min(880px, calc(100vh - 48px));
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 52px;
+      align-items: stretch;
+    }
+
+    .app-window {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--window);
+      border: 1px solid #293545;
+      border-radius: 14px;
+      box-shadow: none;
+    }
+
+    .titlebar {
+      height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 0 14px;
+      background: var(--titlebar);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .window-controls { display: flex; gap: 8px; align-items: center; }
+
+    .window-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+    }
+
+    .window-dot.red { background: #ff6b6b; }
+    .window-dot.yellow { background: #f7c75b; }
+    .window-dot.green { background: #5fd27a; }
+
+    .window-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .file-glyph {
+      width: auto;
+      min-width: 25px;
+      max-width: 72px;
+      height: 17px;
+      display: inline-grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 0 4px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      border: 1px solid currentColor;
+      border-radius: 2px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .workspace {
+      position: relative;
+      min-height: 0;
+      flex: 1 1 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .editor-pane {
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--editor);
+    }
+
+    .editor-tabs {
+      height: 43px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: stretch;
+      background: var(--sidebar);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .editor-tab {
+      min-width: 170px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      border-right: 1px solid var(--line);
+      border-top: 1px solid var(--teal);
+      background: var(--editor);
+    }
+
+    .editor-tab .close { margin-left: auto; color: var(--muted); font-size: 16px; }
+
+    .editor-toolbar {
+      height: 36px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 20px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      border-bottom: 1px solid rgba(32, 42, 56, .65);
+    }
+
+    .crumb-separator { color: var(--faint); }
+    .crumb-current { color: #bac7d7; }
+    .toolbar-spacer { flex: 1; }
+    .language-pill { color: var(--blue); }
+
+    .code-scroll {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: auto;
+      scrollbar-color: #354154 transparent;
+      scrollbar-width: thin;
+    }
+
+    .code-lines {
+      min-height: 100%;
+      min-width: max-content;
+      padding: 20px 0 180px;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.78;
+      letter-spacing: .005em;
+    }
+
+    .code-row {
+      min-height: 25px;
+      display: flex;
+      align-items: baseline;
+    }
+
+    .code-row.current {
+      background: rgba(37, 52, 70, .25);
+    }
+
+    .line-number {
+      width: 58px;
+      flex: 0 0 58px;
+      padding-right: 18px;
+      color: #485467;
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-text {
+      display: inline-block;
+      min-width: 3px;
+      padding-right: 28px;
+      white-space: pre;
+      color: #dce5f2;
+    }
+
+    .tok-keyword { color: var(--purple); }
+    .tok-function { color: var(--blue); }
+    .tok-string { color: var(--green); }
+    .tok-number { color: var(--orange); }
+    .tok-variable { color: var(--orange); }
+    .tok-operator { color: #aab7c8; }
+    .tok-namespace { color: var(--purple); }
+    .tok-class { color: var(--pink); }
+    .tok-comment { color: #68798b; font-style: italic; }
+    .tok-property { color: var(--teal); }
+    .tok-constant { color: var(--pink); }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.18em;
+      margin-left: 1px;
+      vertical-align: -.22em;
+      background: var(--teal);
+      box-shadow: 0 0 12px rgba(97, 214, 194, .9);
+      animation: blink 1.05s steps(1, end) infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .control-tray {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      grid-column: 1;
+      grid-row: 1;
+      align-self: end;
+      z-index: 4;
+      width: auto;
+      margin: 0;
+      padding: 13px;
+      background: rgba(15, 20, 29, .96);
+      border: 1px solid #334154;
+      border-radius: 10px;
+      box-shadow: none;
+      backdrop-filter: blur(14px);
+    }
+
+    .control-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .control-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #d6deea;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .control-title::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 11px rgba(97, 214, 194, .66);
+    }
+
+    .phase-label { color: var(--muted); font-family: var(--mono); font-size: 10px; }
+
+    .metadata-editor {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metadata-title {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px;
+      gap: 8px;
+    }
+
+    .metadata-field {
+      display: block;
+      min-width: 0;
+    }
+
+    .metadata-field.project-field { grid-column: 1 / -1; }
+
+    .metadata-field span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .metadata-input {
+      width: 100%;
+      height: 30px;
+      min-width: 0;
+      padding: 0 7px;
+      color: #ced9e8;
+      background: #0b1018;
+      border: 1px solid #2d3a4b;
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 10px;
+      padding: 3px;
+      background: #0b1018;
+      border: 1px solid #293648;
+      border-radius: 6px;
+    }
+
+    .mode-button {
+      min-height: 27px;
+      padding: 0 6px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .mode-button[aria-pressed="true"] {
+      background: #253244;
+      color: var(--text);
+    }
+
+    .mode-button:hover { color: var(--text); }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-button, .small-button {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 0;
+      padding: 0 8px;
+      border: 1px solid #354357;
+      border-radius: 6px;
+      background: #182231;
+      color: #cbd6e4;
+      cursor: pointer;
+      font-size: 11px;
+      transition: background .16s ease, border-color .16s ease, color .16s ease;
+    }
+
+    .control-button:hover, .small-button:hover { background: #223044; border-color: #51637b; color: #fff; }
+
+    .control-button.primary {
+      flex: 1;
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #08201f;
+      font-weight: 600;
+    }
+
+    .control-button.primary:hover { background: #7ce5d1; border-color: #7ce5d1; }
+
+    .control-button .play-icon { font-size: 12px; line-height: 1; }
+
+    .speed-select {
+      width: 76px;
+      min-width: 0;
+      height: 30px;
+      padding: 0 5px;
+      border: 1px solid #354357;
+      border-radius: 6px;
+      background: #182231;
+      color: #cbd6e4;
+      font-size: 11px;
+    }
+
+    .progress-track {
+      height: 3px;
+      margin: 12px 0 11px;
+      overflow: hidden;
+      border-radius: 3px;
+      background: #253143;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--teal);
+      box-shadow: 0 0 10px rgba(97, 214, 194, .58);
+      transition: width .12s linear;
+    }
+
+    .control-bottomline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .keyboard-hint { color: var(--faint); font-family: var(--mono); font-size: 10px; }
+
+    .script-editor {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .script-editor.open { display: block; }
+
+    .script-grid { display: grid; grid-template-columns: 1fr; gap: 9px; }
+
+    .script-field label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .script-field textarea {
+      width: 100%;
+      min-height: 122px;
+      resize: vertical;
+      padding: 8px;
+      color: #ced9e8;
+      background: #0b1018;
+      border: 1px solid #2d3a4b;
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .script-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 9px; }
+
+    .show-controls {
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      z-index: 4;
+      display: none;
+    }
+
+    .controls-hidden .control-tray { display: none; }
+    .controls-hidden .show-controls { display: inline-flex; }
+
+    .resize-handle {
+      position: absolute;
+      right: 1px;
+      bottom: 1px;
+      z-index: 5;
+      width: 23px;
+      height: 23px;
+      padding: 0;
+      border: 0;
+      background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(117, 129, 148, .75) 4px 5px, transparent 5px 8px);
+      cursor: nwse-resize;
+      opacity: .72;
+    }
+
+    .resize-handle:hover { opacity: 1; }
+
+    @media (max-width: 760px) {
+      .stage { padding: 0; }
+      .demo-layout { width: 100%; height: auto; min-height: 100vh; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(380px, 1fr) auto; gap: 12px; }
+      .app-window { min-height: 0; height: auto; grid-column: 1; grid-row: 1; border: 0; border-radius: 0; }
+      .titlebar { grid-template-columns: auto 1fr auto; }
+      .window-title { justify-self: center; }
+      .editor-tab { min-width: 145px; }
+      .line-number { width: 48px; flex-basis: 48px; padding-right: 13px; }
+      .code-lines { font-size: 12px; }
+      .control-tray { grid-column: 1; grid-row: 2; align-self: stretch; margin: 0 11px 13px; width: auto; }
+      .show-controls { left: 11px; bottom: 13px; }
+    }
+
+    @media (max-width: 500px) {
+      .titlebar { grid-template-columns: auto 1fr; }
+      .window-title { justify-self: end; }
+      .script-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="demo-layout" id="demoLayout">
+      <section class="control-tray" aria-label="Animation controls">
+        <div class="control-topline">
+          <div class="control-title">Typing sequence</div>
+          <div class="phase-label" id="phaseLabel">Ready · preview</div>
+        </div>
+        <div class="metadata-editor" aria-label="Editor details">
+          <div class="metadata-title">Editor details</div>
+          <div class="metadata-grid">
+            <label class="metadata-field">
+              <span>Filename</span>
+              <input class="metadata-input" id="fileNameInput" type="text" value="example-plugin.php" autocomplete="off">
+            </label>
+            <label class="metadata-field">
+              <span>File type</span>
+              <input class="metadata-input" id="fileTypeInput" type="text" value="PHP" autocomplete="off">
+            </label>
+            <label class="metadata-field project-field">
+              <span>Project name</span>
+              <input class="metadata-input" id="projectNameInput" type="text" value="code-editor-demo" autocomplete="off">
+            </label>
+          </div>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Animation mode">
+          <button class="mode-button" id="singleModeButton" type="button" aria-pressed="true">Single version</button>
+          <button class="mode-button" id="rewriteModeButton" type="button" aria-pressed="false">Erase + rewrite</button>
+        </div>
+        <div class="control-row">
+          <button class="control-button primary" id="playButton" type="button"><span class="play-icon" id="playIcon">▶</span><span id="playLabel">Play demo</span></button>
+          <button class="control-button" id="resetButton" type="button">Reset</button>
+          <select class="speed-select" id="speedSelect" aria-label="Typing speed">
+            <option value="72">Slow</option>
+            <option value="38" selected>Medium</option>
+            <option value="18">Fast</option>
+          </select>
+        </div>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="control-bottomline">
+          <span class="keyboard-hint" id="sequenceHint">version A → erase → version B</span>
+          <button class="small-button" id="editButton" type="button">Edit script</button>
+        </div>
+        <div class="script-editor" id="scriptEditor">
+          <div class="script-grid">
+            <div class="script-field" id="versionBField">
+              <label for="versionA">Version A · type first</label>
+              <textarea id="versionA" spellcheck="false"></textarea>
+            </div>
+            <div class="script-field">
+              <label for="versionB">Version B · rewrite</label>
+              <textarea id="versionB" spellcheck="false"></textarea>
+            </div>
+          </div>
+          <div class="script-actions"><button class="small-button" id="cancelScriptButton" type="button">Cancel</button><button class="small-button" id="saveScriptButton" type="button">Apply script</button></div>
+        </div>
+      </section>
+
+    <section class="app-window" aria-label="Code editor typing demo">
+      <header class="titlebar">
+        <div class="window-controls" aria-hidden="true">
+          <span class="window-dot red"></span>
+          <span class="window-dot yellow"></span>
+          <span class="window-dot green"></span>
+        </div>
+        <div class="window-title">
+          <span class="file-glyph" id="titleFileType">PHP</span>
+          <span><span id="headerFileName">example-plugin.php</span> — <span id="headerProjectName">code-editor-demo</span></span>
+        </div>
+      </header>
+
+      <div class="workspace" id="workspace">
+        <section class="editor-pane" aria-label="Editor">
+          <div class="editor-tabs">
+            <div class="editor-tab"><span class="file-glyph" id="tabFileType">PHP</span><span id="tabFileName">example-plugin.php</span><span class="close">×</span></div>
+          </div>
+          <div class="editor-toolbar">
+            <span>src</span><span class="crumb-separator">›</span><span class="crumb-current" id="crumbCurrent">example-plugin.php</span>
+            <span class="toolbar-spacer"></span><span>Ln <span id="linePosition">1</span>, Col <span id="columnPosition">1</span></span><span class="language-pill" id="languagePill">PHP</span>
+          </div>
+          <div class="code-scroll" id="codeScroll">
+            <div class="code-lines" id="codeLines" role="textbox" aria-label="Animated code preview" aria-live="off"></div>
+          </div>
+          <button class="resize-handle" id="resizeHandle" type="button" aria-label="Resize editor window"></button>
+        </section>
+
+      </div>
+
+    </section>
+      <button class="small-button show-controls" id="showControlsButton" type="button">Show controls</button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const phpOpenTag = '<' + '?php';
+      const isPhpFile = true;
+      const defaults = {
+        a: `${phpOpenTag}
+
+if ( 'completed' === $order->get_status() ) {`,
+        b: `${phpOpenTag}
+
+use Automattic\\WooCommerce\\Enums\\OrderStatus;
+
+if ( OrderStatus::COMPLETED === $order->get_status() ) {
+
+}`
+      };
+
+      const codeLines = document.getElementById('codeLines');
+      const playButton = document.getElementById('playButton');
+      const playIcon = document.getElementById('playIcon');
+      const playLabel = document.getElementById('playLabel');
+      const singleModeButton = document.getElementById('singleModeButton');
+      const rewriteModeButton = document.getElementById('rewriteModeButton');
+      const resetButton = document.getElementById('resetButton');
+      const editButton = document.getElementById('editButton');
+      const cancelScriptButton = document.getElementById('cancelScriptButton');
+      const saveScriptButton = document.getElementById('saveScriptButton');
+      const showControlsButton = document.getElementById('showControlsButton');
+      const scriptEditor = document.getElementById('scriptEditor');
+      const versionAInput = document.getElementById('versionA');
+      const versionBInput = document.getElementById('versionB');
+      const versionBField = document.getElementById('versionBField');
+      const speedSelect = document.getElementById('speedSelect');
+      const fileNameInput = document.getElementById('fileNameInput');
+      const fileTypeInput = document.getElementById('fileTypeInput');
+      const projectNameInput = document.getElementById('projectNameInput');
+      const titleFileType = document.getElementById('titleFileType');
+      const headerFileName = document.getElementById('headerFileName');
+      const headerProjectName = document.getElementById('headerProjectName');
+      const tabFileType = document.getElementById('tabFileType');
+      const tabFileName = document.getElementById('tabFileName');
+      const crumbCurrent = document.getElementById('crumbCurrent');
+      const languagePill = document.getElementById('languagePill');
+      const phaseLabel = document.getElementById('phaseLabel');
+      const sequenceHint = document.getElementById('sequenceHint');
+      const progressFill = document.getElementById('progressFill');
+      const linePosition = document.getElementById('linePosition');
+      const columnPosition = document.getElementById('columnPosition');
+      const demoLayout = document.getElementById('demoLayout');
+      const resizeHandle = document.getElementById('resizeHandle');
+
+      let sourceA = defaults.a;
+      let sourceB = defaults.b;
+      let preservedPrefix = '';
+      let animatedA = sourceA;
+      let animatedB = sourceB;
+      let mode = 'single';
+      let currentCode = sourceA;
+      let phase = 'idle';
+      let index = sourceA.length;
+      let paused = false;
+      let timerId = null;
+      let pendingAction = null;
+      let pendingDelay = 0;
+      let pendingStartedAt = 0;
+      const preTypingDelay = 3000;
+
+      const keywords = new Set(['php', 'const', 'let', 'var', 'await', 'if', 'else', 'return', 'function', 'new', 'async', 'for', 'of', 'import', 'from', 'use', 'namespace', 'as', 'true', 'false', 'null', 'echo', 'public', 'private', 'protected', 'class', 'extends', 'implements', 'final', 'abstract', 'trait', 'interface', 'readonly']);
+      const functionNames = new Set(['empty', 'isset', 'count', 'array_map', 'array_filter', 'sanitize_text_field', 'add_action', 'add_filter']);
+      const constants = new Set(['console', 'Math', 'JSON']);
+      const properties = new Set(['items', 'length']);
+
+      function escapeHtml(value) {
+        return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function token(className, value) {
+        return `<span class="${className}">${escapeHtml(value)}</span>`;
+      }
+
+      function updateEditorMetadata() {
+        const fileName = fileNameInput.value.trim() || 'untitled.php';
+        const fileType = fileTypeInput.value.trim() || 'TEXT';
+        const projectName = projectNameInput.value.trim() || 'untitled-project';
+
+        titleFileType.textContent = fileType;
+        headerFileName.textContent = fileName;
+        headerProjectName.textContent = projectName;
+        tabFileType.textContent = fileType;
+        tabFileName.textContent = fileName;
+        crumbCurrent.textContent = fileName;
+        languagePill.textContent = fileType;
+      }
+
+      function highlightLine(line) {
+        let html = '';
+        let cursor = 0;
+        while (cursor < line.length) {
+          const rest = line.slice(cursor);
+          if (rest.startsWith(phpOpenTag)) {
+            html += token('tok-keyword', rest.slice(0, phpOpenTag.length));
+            cursor += phpOpenTag.length;
+            continue;
+          }
+          if (rest.startsWith('?>')) {
+            html += token('tok-keyword', rest.slice(0, 2));
+            cursor += 2;
+            continue;
+          }
+          if (rest.startsWith('//') || rest.startsWith('/*') || line[cursor] === '#') {
+            html += token('tok-comment', rest);
+            break;
+          }
+          const char = line[cursor];
+          if (char === '$') {
+            const variableMatch = rest.match(/^\$[A-Za-z_][\w]*/);
+            if (variableMatch) {
+              html += token('tok-variable', variableMatch[0]);
+              cursor += variableMatch[0].length;
+              continue;
+            }
+          }
+          if (rest.startsWith('->') || rest.startsWith('=>') || rest.startsWith('::') || rest.startsWith('===') || rest.startsWith('!==')) {
+            const operator = rest.match(/^(?:->|=>|::|===|!==)/)[0];
+            html += token('tok-operator', operator);
+            cursor += operator.length;
+            continue;
+          }
+          if (char === '"' || char === "'" || char === '`') {
+            let end = cursor + 1;
+            while (end < line.length) {
+              if (line[end] === '\\') { end += 2; continue; }
+              if (line[end] === char) { end += 1; break; }
+              end += 1;
+            }
+            html += token('tok-string', line.slice(cursor, end));
+            cursor = end;
+            continue;
+          }
+          const namespaceMatch = rest.match(/^[A-Za-z_][\w]*(?:\\[A-Za-z_][\w]*)+/);
+          if (namespaceMatch) {
+            html += token('tok-namespace', namespaceMatch[0]);
+            cursor += namespaceMatch[0].length;
+            continue;
+          }
+          const wordMatch = rest.match(/^[A-Za-z_$][\w$]*/);
+          if (wordMatch) {
+            const word = wordMatch[0];
+            let className = '';
+            if (functionNames.has(word) || (!keywords.has(word) && /^\s*\(/.test(line.slice(cursor + word.length)))) className = 'tok-function';
+            else if (/^\s*::/.test(line.slice(cursor + word.length))) className = 'tok-class';
+            else if (/^[A-Z][A-Z0-9_]*$/.test(word)) className = 'tok-constant';
+            else if (keywords.has(word)) className = 'tok-keyword';
+            else if (constants.has(word)) className = 'tok-constant';
+            else if (properties.has(word)) className = 'tok-property';
+            html += className ? token(className, word) : escapeHtml(word);
+            cursor += word.length;
+            continue;
+          }
+          const numberMatch = rest.match(/^\d+(?:\.\d+)?/);
+          if (numberMatch) {
+            html += token('tok-number', numberMatch[0]);
+            cursor += numberMatch[0].length;
+            continue;
+          }
+          html += escapeHtml(char);
+          cursor += 1;
+        }
+        return html || '&nbsp;';
+      }
+
+      function renderCode(code, showCursor = true) {
+        const lines = code.split('\n');
+        const lastLine = lines.length - 1;
+        codeLines.innerHTML = lines.map((line, lineIndex) => {
+          const cursor = showCursor && lineIndex === lastLine ? '<span class="cursor" aria-hidden="true"></span>' : '';
+          const currentClass = lineIndex === lastLine ? ' current' : '';
+          return `<div class="code-row${currentClass}"><span class="line-number">${String(lineIndex + 1).padStart(2, ' ')}</span><span class="code-text">${highlightLine(line)}${cursor}</span></div>`;
+        }).join('');
+        const currentLine = lines[lastLine] || '';
+        linePosition.textContent = String(lines.length);
+        columnPosition.textContent = String(currentLine.length + 1);
+      }
+
+      function syncAnimatedSources() {
+        const prefixMatch = isPhpFile ? sourceA.match(/^<\?php(?:\r?\n){2}/) : null;
+        preservedPrefix = prefixMatch && sourceB.startsWith(prefixMatch[0]) ? prefixMatch[0] : '';
+        animatedA = sourceA.slice(preservedPrefix.length);
+        animatedB = sourceB.slice(preservedPrefix.length);
+      }
+
+      function updateProgress() {
+        const total = mode === 'rewrite' ? animatedA.length * 2 + animatedB.length : animatedA.length;
+        let completed = 0;
+        if (phase === 'typingA') completed = index;
+        if (phase === 'holdingA') completed = animatedA.length;
+        if (phase === 'erasingA') completed = animatedA.length + (animatedA.length - index);
+        if (phase === 'holdingEmpty') completed = animatedA.length * 2;
+        if (phase === 'typingB') completed = animatedA.length * 2 + index;
+        if (phase === 'done') completed = total;
+        progressFill.style.width = `${total ? Math.min(100, Math.max(0, completed / total * 100)) : 0}%`;
+      }
+
+      function setLabels() {
+        const labels = {
+          idle: 'Ready · preview',
+          preparing: 'Ready · blank editor',
+          typingA: 'Typing · version A',
+          holdingA: 'Pause · first pass',
+          erasingA: 'Erasing · version A',
+          holdingEmpty: 'Pause · blank line',
+          typingB: 'Rewriting · version B',
+          done: 'Done · version B'
+        };
+        phaseLabel.textContent = labels[phase];
+        if (mode === 'single' && phase === 'done') phaseLabel.textContent = 'Done · single version';
+        sequenceHint.textContent = mode === 'single' ? 'type version A' : 'version A → erase → version B';
+        const isRunning = ['preparing', 'typingA', 'holdingA', 'erasingA', 'holdingEmpty', 'typingB'].includes(phase) && !paused;
+        playIcon.textContent = isRunning ? 'Ⅱ' : '▶';
+        playLabel.textContent = isRunning ? 'Pause' : paused ? 'Resume' : phase === 'done' ? 'Play again' : 'Play demo';
+      }
+
+      function updateModeControls() {
+        const rewriteMode = mode === 'rewrite';
+        singleModeButton.setAttribute('aria-pressed', String(!rewriteMode));
+        rewriteModeButton.setAttribute('aria-pressed', String(rewriteMode));
+        versionBField.hidden = !rewriteMode;
+        sequenceHint.textContent = rewriteMode ? 'version A → erase → version B' : 'type version A';
+      }
+
+      function setMode(nextMode) {
+        if (mode === nextMode) return;
+        clearTimer();
+        paused = false;
+        mode = nextMode;
+        updateModeControls();
+        reset();
+      }
+
+      function render() {
+        renderCode(currentCode, true);
+        updateProgress();
+        setLabels();
+      }
+
+      function clearTimer() {
+        if (timerId !== null) {
+          clearTimeout(timerId);
+          timerId = null;
+        }
+      }
+
+      function schedule(action, delay) {
+        clearTimer();
+        pendingAction = action;
+        pendingDelay = delay;
+        pendingStartedAt = performance.now();
+        timerId = setTimeout(() => {
+          timerId = null;
+          pendingAction = null;
+          pendingDelay = 0;
+          action();
+        }, delay);
+      }
+
+      function tick() {
+        if (paused) return;
+        if (phase === 'typingA') {
+          if (index < animatedA.length) {
+            index += 1;
+            currentCode = preservedPrefix + animatedA.slice(0, index);
+            render();
+            schedule(tick, Number(speedSelect.value));
+          } else {
+            if (mode === 'single') {
+              phase = 'done';
+              currentCode = preservedPrefix + animatedA;
+              render();
+            } else {
+              phase = 'holdingA';
+              render();
+              schedule(() => { phase = 'erasingA'; index = animatedA.length; tick(); }, 900);
+            }
+          }
+          return;
+        }
+        if (phase === 'erasingA') {
+          if (index > 0) {
+            index -= 1;
+            currentCode = preservedPrefix + animatedA.slice(0, index);
+            render();
+            schedule(tick, Math.max(12, Number(speedSelect.value) * .72));
+          } else {
+            phase = 'holdingEmpty';
+            currentCode = preservedPrefix;
+            render();
+            schedule(() => { phase = 'typingB'; index = 0; tick(); }, 360);
+          }
+          return;
+        }
+        if (phase === 'typingB') {
+          if (index < animatedB.length) {
+            index += 1;
+            currentCode = preservedPrefix + animatedB.slice(0, index);
+            render();
+            schedule(tick, Number(speedSelect.value));
+          } else {
+            phase = 'done';
+            currentCode = preservedPrefix + animatedB;
+            render();
+          }
+        }
+      }
+
+      function startOrPause() {
+        const runningPhases = ['preparing', 'typingA', 'holdingA', 'erasingA', 'holdingEmpty', 'typingB'];
+        if (!runningPhases.includes(phase) || (phase === 'done')) {
+          clearTimer();
+          paused = false;
+          index = 0;
+          currentCode = preservedPrefix;
+          phase = 'preparing';
+          render();
+          schedule(() => { phase = 'typingA'; tick(); }, preTypingDelay);
+          return;
+        }
+        if (paused) {
+          paused = false;
+          setLabels();
+          if (pendingAction) schedule(pendingAction, Math.max(0, pendingDelay));
+          else tick();
+        } else {
+          paused = true;
+          if (timerId !== null) {
+            pendingDelay = Math.max(0, pendingDelay - (performance.now() - pendingStartedAt));
+            clearTimer();
+          }
+          setLabels();
+        }
+      }
+
+      function reset() {
+        clearTimer();
+        pendingAction = null;
+        pendingDelay = 0;
+        paused = false;
+        phase = 'idle';
+        syncAnimatedSources();
+        index = 0;
+        currentCode = preservedPrefix;
+        render();
+      }
+
+      function openScriptEditor() {
+        versionAInput.value = sourceA;
+        versionBInput.value = sourceB;
+        scriptEditor.classList.add('open');
+        editButton.textContent = 'Close editor';
+        versionAInput.focus();
+      }
+
+      function closeScriptEditor() {
+        scriptEditor.classList.remove('open');
+        editButton.textContent = 'Edit script';
+      }
+
+      function saveScript() {
+        sourceA = versionAInput.value;
+        sourceB = versionBInput.value;
+        closeScriptEditor();
+        reset();
+      }
+
+      playButton.addEventListener('click', startOrPause);
+      singleModeButton.addEventListener('click', () => setMode('single'));
+      rewriteModeButton.addEventListener('click', () => setMode('rewrite'));
+      resetButton.addEventListener('click', reset);
+      editButton.addEventListener('click', () => scriptEditor.classList.contains('open') ? closeScriptEditor() : openScriptEditor());
+      cancelScriptButton.addEventListener('click', closeScriptEditor);
+      saveScriptButton.addEventListener('click', saveScript);
+      showControlsButton.addEventListener('click', () => demoLayout.classList.remove('controls-hidden'));
+      [fileNameInput, fileTypeInput, projectNameInput].forEach((input) => input.addEventListener('input', updateEditorMetadata));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.target.closest('textarea, select')) return;
+        if (event.code === 'Space') {
+          event.preventDefault();
+          startOrPause();
+        }
+        if (event.key.toLowerCase() === 'r') reset();
+      });
+
+      let resizeSession = null;
+
+      function beginResize(event) {
+        event.preventDefault();
+        const rect = demoLayout.getBoundingClientRect();
+        resizeSession = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          startWidth: rect.width,
+          startHeight: rect.height
+        };
+        resizeHandle.setPointerCapture(event.pointerId);
+      }
+
+      function resizeWindow(event) {
+        if (!resizeSession) return;
+        const compact = window.matchMedia('(max-width: 760px)').matches;
+        const minWidth = compact ? 320 : 760;
+        const minHeight = compact ? 480 : 640;
+        const maxWidth = Math.max(minWidth, window.innerWidth - (compact ? 0 : 48));
+        const maxHeight = Math.max(minHeight, window.innerHeight - (compact ? 0 : 48));
+        const nextWidth = Math.min(maxWidth, Math.max(minWidth, resizeSession.startWidth + event.clientX - resizeSession.startX));
+        const nextHeight = Math.min(maxHeight, Math.max(minHeight, resizeSession.startHeight + event.clientY - resizeSession.startY));
+        demoLayout.style.width = `${nextWidth}px`;
+        demoLayout.style.height = `${nextHeight}px`;
+      }
+
+      function endResize() {
+        resizeSession = null;
+      }
+
+      resizeHandle.addEventListener('pointerdown', beginResize);
+      document.addEventListener('pointermove', resizeWindow);
+      document.addEventListener('pointerup', endResize);
+      document.addEventListener('pointercancel', endResize);
+
+      // Double-click the unobstructed editor to hide the tray for a clean recording.
+      document.querySelector('.editor-pane').addEventListener('dblclick', () => demoLayout.classList.toggle('controls-hidden'));
+
+      versionAInput.value = sourceA;
+      versionBInput.value = sourceB;
+      updateEditorMetadata();
+      updateModeControls();
+      reset();
+    })();
+  </script>
+</body>
+</html>
