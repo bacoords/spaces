@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Start with AI and WordPress. Create a local site, explore AI tools in WordPress, and build with open developer tools.">
+  <title>AI and WordPress — WordPress.org</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="global-header">
+    <div class="global-header__inner">
+      <a class="wp-brand" href="https://wordpress.org/" aria-label="WordPress.org home">
+        <span class="wp-mark" aria-hidden="true">W</span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="global-navigation">
+        <span>Menu</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+
+      <nav class="global-nav" id="global-navigation" aria-label="Main">
+        <a href="https://wordpress.org/showcase/">Showcase</a>
+        <a href="https://wordpress.org/plugins/">Plugins</a>
+        <a href="https://wordpress.org/themes/">Themes</a>
+        <a href="https://wordpress.org/hosting/">Hosting</a>
+        <a href="https://wordpress.org/news/">News</a>
+        <a href="https://wordpress.org/documentation/">Resources <span aria-hidden="true">⌄</span></a>
+        <a href="https://wordpress.org/about/">About <span aria-hidden="true">⌄</span></a>
+        <a href="https://mercantile.wordpress.org/">Swag <span aria-hidden="true">↗</span></a>
+      </nav>
+
+      <div class="global-actions">
+        <a class="search-link" href="https://wordpress.org/search/" aria-label="Search WordPress.org">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        </a>
+        <a class="button button--small" href="https://wordpress.org/download/">Get WordPress</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="section-nav">
+    <div class="section-nav__inner">
+      <a class="section-nav__title" href="#top">WordPress AI</a>
+      <nav aria-label="AI section">
+        <a href="#get-started">Get started</a>
+        <a href="#use-ai">Use AI</a>
+        <a href="#build">Build with AI</a>
+        <a href="#principles">Principles</a>
+      </nav>
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="kicker">AI + WordPress</p>
+          <h1 id="hero-title">Build with AI.<br><span>Keep WordPress open.</span></h1>
+          <p class="hero__lede">Begin with a blank WordPress site on your computer using Playground CLI, then shape it with the AI tools and workflow that work for you.</p>
+          <div class="hero__actions">
+            <button class="button copy-trigger" type="button" data-copy-target="starter-prompt">
+              <span>Copy the starter prompt</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V4h12v12h-3M4 8h12v12H4z"/></svg>
+            </button>
+            <a class="text-link" href="#use-ai">Explore AI in WordPress <span aria-hidden="true">↘</span></a>
+          </div>
+          <p class="hero__note">Use it with any AI coding agent. No existing site required.</p>
+        </div>
+
+        <div class="prompt-card" id="get-started">
+          <div class="prompt-card__header">
+            <span>Starter prompt</span>
+            <span>Any AI agent</span>
+          </div>
+          <pre id="starter-prompt" tabindex="0" aria-label="Starter prompt for an AI coding agent">Create a blank, persistent WordPress site for me on my computer using WordPress Playground CLI (@wp-playground/cli).
+
+Work in a new, clearly named project directory and use the simplified start command:
+npx @wp-playground/cli@latest start
+
+Use the latest stable WordPress release and its default theme. Do not add sample content, plugins, themes, or custom code unless required to make the site run.
+
+When the site is ready:
+1. Confirm the dashboard and front end load.
+2. Tell me the local URL and how to open the dashboard.
+3. Tell me where the persistent site files live and how to start and stop the environment.
+4. Summarize what you created, then wait for my next instruction.</pre>
+          <div class="prompt-card__footer">
+            <span class="copy-status" aria-live="polite">Ready to copy</span>
+            <button class="prompt-copy copy-trigger" type="button" data-copy-target="starter-prompt">
+              <span>Copy prompt</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V4h12v12h-3M4 8h12v12H4z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="start-path" aria-labelledby="start-title">
+      <div class="start-path__inner">
+        <div class="start-path__intro">
+          <h2 id="start-title">Three ways AI meets WordPress</h2>
+        </div>
+        <div class="steps">
+          <article>
+            <span class="step-number">External agents</span>
+            <h3>AI that works with your site</h3>
+            <p>Connect an AI agent to draft, organize, update, and manage your site through WordPress permissions and open interfaces like MCP.</p>
+          </article>
+          <article>
+            <span class="step-number">Inside WordPress</span>
+            <h3>AI in the tools you already use</h3>
+            <p>Bring AI into familiar editing and administration flows to help people create content and run their sites.</p>
+          </article>
+          <article>
+            <span class="step-number">For builders</span>
+            <h3>An open foundation to extend</h3>
+            <p>Use the Abilities API, agent skills, Playground CLI, and WP-CLI to build new AI workflows on WordPress.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="inside-wp" id="use-ai" aria-labelledby="inside-title">
+      <div class="inside-wp__inner">
+        <div class="section-heading section-heading--dark">
+          <div>
+            <h2 id="inside-title">AI, inside WordPress</h2>
+          </div>
+          <p>Connect the provider you choose, turn on the features you need, and let trusted tools work with your site.</p>
+        </div>
+
+        <div class="tool-grid tool-grid--users">
+          <a class="tool-card" href="https://wordpress.org/documentation/article/settings-connectors-screen/">
+            <span class="tool-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M11 5v7m10-7v7M8 12h16v4a8 8 0 0 1-8 8 8 8 0 0 1-8-8zM16 24v4"/></svg>
+            </span>
+            <div>
+              <p class="tool-card__label">Connect</p>
+              <h3>Connectors</h3>
+              <p>Choose an AI provider and manage its connection from one place in your WordPress dashboard.</p>
+            </div>
+            <span class="tool-card__link">Set up a connector <span aria-hidden="true">↗</span></span>
+          </a>
+
+          <a class="tool-card" href="https://wordpress.org/plugins/ai/">
+            <span class="tool-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M7 7h18v18H7zM11 12h10m-10 4h7m-7 4h5"/></svg>
+            </span>
+            <div>
+              <p class="tool-card__label">Create</p>
+              <h3>AI Experiments</h3>
+              <p>Try opt-in tools for writing, images, accessibility, moderation, and content management.</p>
+            </div>
+            <span class="tool-card__link">Explore the AI plugin <span aria-hidden="true">↗</span></span>
+          </a>
+
+          <a class="tool-card" href="https://developer.wordpress.org/news/2026/02/from-abilities-to-ai-agents-introducing-the-wordpress-mcp-adapter/">
+            <span class="tool-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><circle cx="9" cy="16" r="3"/><circle cx="23" cy="9" r="3"/><circle cx="23" cy="23" r="3"/><path d="m12 15 8-5m-8 7 8 5"/></svg>
+            </span>
+            <div>
+              <p class="tool-card__label">Collaborate</p>
+              <h3>MCP</h3>
+              <p>Connect an AI assistant to the abilities you choose to expose from your WordPress site.</p>
+            </div>
+            <span class="tool-card__link">Meet the MCP Adapter <span aria-hidden="true">↗</span></span>
+          </a>
+
+          <a class="tool-card" href="https://developer.wordpress.org/cli/commands/ability/">
+            <span class="tool-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M5 7h22v18H5zM10 13l4 3-4 3m7 0h6"/></svg>
+            </span>
+            <div>
+              <p class="tool-card__label">Automate</p>
+              <h3>WP-CLI</h3>
+              <p>List, inspect, and run WordPress abilities from a scriptable command-line workflow.</p>
+            </div>
+            <span class="tool-card__link">Explore ability commands <span aria-hidden="true">↗</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="builders" id="build" aria-labelledby="builders-title">
+      <div class="builders__inner">
+        <div class="builders__intro">
+          <h2 id="builders-title">Building blocks for builders</h2>
+          <p>Use the open APIs and shared knowledge behind WordPress AI to create features that work across providers, plugins, and tools.</p>
+        </div>
+
+        <div class="builder-list">
+          <a href="https://developer.wordpress.org/apis/abilities-api/">
+            <span class="builder-list__number">01</span>
+            <div>
+              <h3>Abilities API</h3>
+              <p>Register discoverable, permission-aware actions that WordPress, apps, and agents can understand.</p>
+            </div>
+            <span class="builder-list__arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://developer.wordpress.org/reference/classes/wordpress-aiclient-aiclient/">
+            <span class="builder-list__number">02</span>
+            <div>
+              <h3>WordPress AI Client</h3>
+              <p>Build AI features against a provider-agnostic interface instead of a single model vendor.</p>
+            </div>
+            <span class="builder-list__arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://github.com/WordPress/agent-skills/">
+            <span class="builder-list__number">03</span>
+            <div>
+              <h3>Agent Skills</h3>
+              <p>Give coding assistants WordPress-specific workflows, standards, checks, and best practices.</p>
+            </div>
+            <span class="builder-list__arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="workspace__inner">
+        <div class="workspace__diagram" aria-hidden="true">
+          <svg viewBox="0 0 580 410" role="img">
+            <g fill="none" stroke="currentColor">
+              <path d="m91 141 198-115 198 115-198 115z"/>
+              <path d="m91 141v36l198 115 198-115v-36"/>
+              <path d="m91 182v36l198 115 198-115v-36" opacity=".65"/>
+              <path d="m91 223v36l198 115 198-115v-36" opacity=".35"/>
+              <path d="m181 141 108-63 108 63-108 63z"/>
+            </g>
+            <text x="289" y="151" text-anchor="middle">W</text>
+            <g class="diagram-nodes">
+              <circle cx="91" cy="141" r="5"/>
+              <circle cx="487" cy="141" r="5"/>
+              <circle cx="289" cy="374" r="5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="workspace__copy">
+          <h2 id="workspace-title">One Playground, from browser to command line</h2>
+          <p>Try WordPress instantly in your browser, then use Playground CLI when you want a persistent site and files on your computer.</p>
+          <div class="workspace__links">
+            <a href="https://developer.wordpress.org/playground/developers/local-development/wp-playground-cli/">Playground CLI <span aria-hidden="true">↗</span></a>
+            <a href="https://wordpress.org/playground/">Browser Playground <span aria-hidden="true">↗</span></a>
+            <a href="https://developer.wordpress.org/playground/blueprints/">Blueprints <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="principles" id="principles" aria-labelledby="principles-title">
+      <div class="principles__inner">
+        <div class="principles__heading">
+          <h2 id="principles-title">Your site.<br>Your tools.<br>Your choice.</h2>
+        </div>
+        <div class="principles__body">
+          <p class="principles__lead">AI in WordPress should expand what people can create without narrowing who controls the tools.</p>
+          <div class="principle-list">
+            <article>
+              <h3>Choose your provider</h3>
+              <p>Connect WordPress to the model or service that fits your needs. Switch without rebuilding every integration.</p>
+            </article>
+            <article>
+              <h3>Keep permission in the loop</h3>
+              <p>WordPress capabilities and user permissions remain part of how tools discover and perform actions.</p>
+            </article>
+            <article>
+              <h3>Build in the open</h3>
+              <p>Study the code, extend the building blocks, share what works, and help shape what comes next.</p>
+            </article>
+          </div>
+          <a class="button button--light" href="https://make.wordpress.org/ai/handbook/projects/">Explore WordPress AI projects</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-labelledby="final-title">
+      <div class="final-cta__inner">
+        <div>
+          <p class="kicker">Begin locally</p>
+          <h2 id="final-title">Start with an empty canvas.</h2>
+          <p>One prompt creates the space. What you make next is yours.</p>
+        </div>
+        <button class="button copy-trigger" type="button" data-copy-target="starter-prompt">
+          <span>Copy the starter prompt</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V4h12v12h-3M4 8h12v12H4z"/></svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <nav class="footer-nav" aria-label="Footer">
+        <div>
+          <a href="https://wordpress.org/about/">About</a>
+          <a href="https://wordpress.org/news/">News</a>
+          <a href="https://wordpress.org/hosting/">Hosting</a>
+          <a href="https://wordpress.org/about/privacy/">Privacy</a>
+        </div>
+        <div>
+          <a href="https://wordpress.org/showcase/">Showcase</a>
+          <a href="https://wordpress.org/themes/">Themes</a>
+          <a href="https://wordpress.org/plugins/">Plugins</a>
+          <a href="https://wordpress.org/patterns/">Patterns</a>
+        </div>
+        <div>
+          <a href="https://learn.wordpress.org/">Learn</a>
+          <a href="https://wordpress.org/documentation/">Documentation</a>
+          <a href="https://developer.wordpress.org/">Developers</a>
+          <a href="https://wordpress.tv/">WordPress.tv <span aria-hidden="true">↗</span></a>
+        </div>
+        <div>
+          <a href="https://make.wordpress.org/">Get Involved</a>
+          <a href="https://events.wordpress.org/">Events</a>
+          <a href="https://wordpressfoundation.org/donate/">Donate <span aria-hidden="true">↗</span></a>
+          <a href="https://mercantile.wordpress.org/">Swag <span aria-hidden="true">↗</span></a>
+        </div>
+        <div>
+          <a href="https://wordpress.com/">WordPress.com <span aria-hidden="true">↗</span></a>
+          <a href="https://ma.tt/">Matt <span aria-hidden="true">↗</span></a>
+          <a href="https://bbpress.org/">bbPress <span aria-hidden="true">↗</span></a>
+          <a href="https://buddypress.org/">BuddyPress <span aria-hidden="true">↗</span></a>
+        </div>
+      </nav>
+
+      <div class="footer-meta">
+        <a class="footer-wordmark" href="https://wordpress.org/">
+          <span class="wp-mark wp-mark--footer" aria-hidden="true">W</span>
+          <span>WordPress.org</span>
+        </a>
+        <p class="code-is-poetry">Code is Poetry</p>
+        <nav class="social-links" aria-label="Social media">
+          <a href="https://www.x.com/WordPress" aria-label="WordPress on X">X</a>
+          <a href="https://bsky.app/profile/wordpress.org" aria-label="WordPress on Bluesky">B</a>
+          <a href="https://mastodon.world/@WordPress" aria-label="WordPress on Mastodon">M</a>
+          <a href="https://www.instagram.com/wordpress/" aria-label="WordPress on Instagram">I</a>
+          <a href="https://www.youtube.com/wordpress" aria-label="WordPress on YouTube">Y</a>
+        </nav>
+      </div>
+      <p class="trademark">The WordPress® trademark is the intellectual property of the WordPress Foundation.</p>
+    </div>
+  </footer>
+</body>
+</html>
