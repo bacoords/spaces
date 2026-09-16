@@ -9,7 +9,7 @@
     :root {
       color-scheme: light;
       --base: #fafafa;
-      --main: #1a1a1a;
+      --main: #1C1A1C;
       --primary: #003353;
       --secondary: #636381;
       --tertiary: #f2f2f0;
@@ -18,6 +18,11 @@
       --content: 740px;
       --wide: 1260px;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      --font-size-x-small: clamp(.8125rem, .813rem + ((1vw - .2rem) * .106), .875rem);
+      --font-size-small: clamp(.90625rem, .906rem + ((1vw - .2rem) * .16), 1rem);
+      --font-size-base: clamp(1rem, 1rem + ((1vw - .2rem) * .107), 1.0625rem);
+      --font-size-medium: clamp(1.3125rem, 1.313rem + ((1vw - .2rem) * .213), 1.4375rem);
+      --font-size-large: clamp(1.75rem, 1.75rem + ((1vw - .2rem) * .851), 2.25rem);
     }
 
     * {
@@ -37,7 +42,7 @@
       background: var(--base);
       color: var(--main);
       font-family: var(--font-sans);
-      font-size: 1.0625rem;
+      font-size: var(--font-size-base);
       line-height: 1.7;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
@@ -81,11 +86,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      font-size: 0.875rem;
+      font-size: var(--font-size-small);
       line-height: 1.4;
     }
 
     .brand {
+      font-size: var(--font-size-base);
       font-weight: 650;
       text-decoration: none;
     }
@@ -109,16 +115,7 @@
     }
 
     .intro {
-      padding-block: clamp(72px, 12vw, 132px) clamp(64px, 9vw, 96px);
-    }
-
-    .eyebrow {
-      margin: 0 0 14px;
-      color: var(--secondary);
-      font-size: 0.8125rem;
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      padding-block: clamp(56px, 9vw, 104px) clamp(64px, 9vw, 96px);
     }
 
     h1,
@@ -131,7 +128,7 @@
     h1 {
       max-width: 11ch;
       margin-bottom: 22px;
-      font-size: clamp(2.75rem, 8vw, 3.75rem);
+      font-size: var(--font-size-large);
       font-weight: 600;
       letter-spacing: -0.04em;
       line-height: 1.04;
@@ -141,7 +138,7 @@
       max-width: 34rem;
       margin-bottom: 0;
       color: var(--secondary);
-      font-size: clamp(1.0625rem, 2vw, 1.165rem);
+      font-size: var(--font-size-base);
     }
 
     .intro-copy a {
@@ -163,7 +160,7 @@
 
     h2 {
       margin-bottom: 0;
-      font-size: clamp(1.75rem, 5vw, 2.35rem);
+      font-size: var(--font-size-medium);
       font-weight: 600;
       letter-spacing: -0.03em;
       line-height: 1.2;
@@ -172,7 +169,7 @@
     .count {
       margin: 0;
       color: var(--secondary);
-      font-size: 0.875rem;
+      font-size: var(--font-size-x-small);
     }
 
     .space-list {
@@ -209,7 +206,7 @@
 
     h3 {
       margin-bottom: 6px;
-      font-size: clamp(1.25rem, 3vw, 1.5rem);
+      font-size: var(--font-size-base);
       font-weight: 600;
       letter-spacing: -0.02em;
       line-height: 1.25;
@@ -219,13 +216,13 @@
       max-width: 34rem;
       margin-bottom: 10px;
       color: var(--secondary);
-      font-size: 0.9375rem;
+      font-size: var(--font-size-small);
       line-height: 1.55;
     }
 
     .space-path {
       color: var(--primary);
-      font-size: 0.8125rem;
+      font-size: var(--font-size-x-small);
       font-weight: 650;
     }
 
@@ -260,7 +257,7 @@
       justify-content: space-between;
       gap: 24px;
       color: var(--secondary);
-      font-size: 0.8125rem;
+      font-size: var(--font-size-x-small);
       line-height: 1.5;
     }
 
@@ -328,7 +325,6 @@
 
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">A directory of small things</p>
       <h1 id="page-title">Spaces</h1>
       <p class="intro-copy">Projects, prototypes, and useful little experiments from <a href="https://www.briancoords.com/">Brian Coords</a>.</p>
     </section>
