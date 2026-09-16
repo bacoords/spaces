@@ -3,7 +3,6 @@ import {
   errorResponse,
   isSameOrigin,
   json,
-  requireAuthentication,
   serverError
 } from "./_shared.mjs";
 
@@ -40,8 +39,6 @@ function toClientRecord(row) {
 
 export async function GET(request, context) {
   try {
-    const unauthorized = await requireAuthentication(request, context.env);
-    if (unauthorized) return unauthorized;
     await ensureSchema(context.env);
     const { results = [] } = await context.env.DB.prepare(`SELECT
       id, session_id, exercise, equipment, weight, reps, set_number, performed_at
@@ -57,8 +54,7 @@ export async function GET(request, context) {
 export async function POST(request, context) {
   if (!isSameOrigin(request)) return errorResponse("Request origin was not accepted.", 403);
   try {
-    const unauthorized = await requireAuthentication(request, context.env);
-    if (unauthorized) return unauthorized;
+    await ensureSchema(context.env);
     const entry = validateEntry(await request.json());
     if (entry.error) return errorResponse(entry.error, 400);
 

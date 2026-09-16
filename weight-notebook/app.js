@@ -12,7 +12,6 @@ const demoRecords = [
 ];
 
 const state = {
-  authenticated: false,
   equipment: "Barbell",
   historyPeriod: "8 weeks",
   records: []
@@ -21,7 +20,6 @@ const state = {
 const elements = {
   appShell: document.querySelector(".app-shell"),
   appStatus: document.querySelector("#appStatus"),
-  cancelLock: document.querySelector("#cancelLock"),
   chartDesc: document.querySelector("#chartDesc"),
   chartLabels: document.querySelector("#chartLabels"),
   chartMarks: document.querySelector("#chartMarks"),
@@ -36,11 +34,6 @@ const elements = {
   lastSets: document.querySelector("#lastSets"),
   bestLine: document.querySelector("#bestLine"),
   bestSet: document.querySelector("#bestSet"),
-  lockButton: document.querySelector("#lockButton"),
-  lockDialog: document.querySelector("#lockDialog"),
-  lockError: document.querySelector("#lockError"),
-  lockForm: document.querySelector("#lockForm"),
-  passwordInput: document.querySelector("#passwordInput"),
   saveButton: document.querySelector("#saveButton"),
   saveMessage: document.querySelector("#saveMessage"),
   sessionNote: document.querySelector("#sessionNote"),
@@ -354,15 +347,6 @@ function selectTab(tab) {
     : state.historyPeriod;
 }
 
-function setLocked(locked, message = "") {
-  elements.appShell.inert = locked;
-  elements.lockError.textContent = message;
-  elements.passwordInput.value = "";
-  if (locked && !elements.lockDialog.open) elements.lockDialog.showModal();
-  if (!locked && elements.lockDialog.open) elements.lockDialog.close();
-  if (locked) window.setTimeout(() => elements.passwordInput.focus(), 0);
-}
-
 async function api(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: "same-origin",
@@ -444,37 +428,11 @@ async function saveCurrentExercise() {
     elements.saveMessage.textContent = `${result.setCount} ${result.setCount === 1 ? "set" : "sets"} saved.`;
     resetSetRows(true);
   } catch (error) {
-    if (error.status === 401) {
-      state.authenticated = false;
-      setLocked(true, "Your session expired. Enter the password again.");
-    } else {
-      elements.saveMessage.textContent = error.message;
-    }
+    elements.saveMessage.textContent = error.message;
   } finally {
     elements.saveButton.disabled = false;
     elements.saveButton.textContent = "Save exercise";
   }
-}
-
-async function unlock(password) {
-  if (isLocalPreview) {
-    if (password !== "lift") throw new Error("For the local preview, use “lift”.");
-  } else {
-    await api("/session", { method: "POST", body: JSON.stringify({ password }) });
-  }
-  state.authenticated = true;
-  setLocked(false);
-  await loadRecords();
-}
-
-async function lock() {
-  if (!isLocalPreview) {
-    try { await api("/session", { method: "DELETE" }); } catch { /* Lock locally even if the request fails. */ }
-  }
-  state.authenticated = false;
-  state.records = [];
-  selectTab("today");
-  setLocked(true);
 }
 
 async function initialize() {
@@ -483,7 +441,6 @@ async function initialize() {
   elements.appShell.classList.add("loading-state");
 
   if (isLocalPreview) {
-    state.authenticated = true;
     await loadRecords();
     elements.appStatus.textContent = "Local preview · changes reset when the page reloads";
     elements.appShell.classList.remove("loading-state");
@@ -491,16 +448,9 @@ async function initialize() {
   }
 
   try {
-    const session = await api("/session");
-    if (session.authenticated) {
-      state.authenticated = true;
-      await loadRecords();
-      setLocked(false);
-    } else {
-      setLocked(true);
-    }
+    await loadRecords();
   } catch (error) {
-    setLocked(true, error.message);
+    elements.appStatus.textContent = error.message;
   } finally {
     elements.appShell.classList.remove("loading-state");
   }
@@ -531,29 +481,6 @@ elements.exerciseSelect.addEventListener("blur", () => renderExercise());
 elements.saveButton.addEventListener("click", saveCurrentExercise);
 elements.todayTab.addEventListener("click", () => selectTab("today"));
 elements.historyTab.addEventListener("click", () => selectTab("history"));
-elements.lockButton.addEventListener("click", lock);
-elements.lockDialog.addEventListener("cancel", event => event.preventDefault());
-elements.cancelLock.addEventListener("click", () => {
-  if (state.authenticated) setLocked(false);
-});
-
-elements.lockForm.addEventListener("submit", async event => {
-  event.preventDefault();
-  const submit = elements.lockForm.querySelector("button[type='submit']");
-  submit.disabled = true;
-  submit.textContent = "Unlocking…";
-  elements.lockError.textContent = "";
-  try {
-    await unlock(elements.passwordInput.value);
-  } catch (error) {
-    elements.lockError.textContent = error.message;
-    elements.passwordInput.select();
-  } finally {
-    submit.disabled = false;
-    submit.textContent = "Unlock";
-  }
-});
-
 function registerWebMcpTools() {
   const context = document.modelContext;
   if (!context?.registerTool) return;
@@ -581,7 +508,6 @@ function registerWebMcpTools() {
       },
       annotations: { readOnlyHint: false, untrustedContentHint: false },
       async execute(input) {
-        if (!state.authenticated) throw new Error("Liftbook must be unlocked first.");
         const result = await createLiftEntry(input);
         elements.exerciseSelect.value = result.exercise;
         renderAll();
@@ -599,7 +525,6 @@ function registerWebMcpTools() {
       },
       annotations: { readOnlyHint: true, untrustedContentHint: false },
       execute(input) {
-        if (!state.authenticated) throw new Error("Liftbook must be unlocked first.");
         const sessions = input.exercise ? sessionsForExercise(input.exercise) : groupSessions();
         return { sessions: sessions.slice(0, 50) };
       }

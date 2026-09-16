@@ -4,5 +4,12 @@
     "kind": "functions",
     "database": true,
     "compatibilityDate": "2026-07-01"
+  },
+  "access": {
+    "public": [
+      "/**",
+      "!/weight-notebook",
+      "!/weight-notebook/**"
+    ]
   }
 }
