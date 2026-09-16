@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { constantTimeEqual, createSession, destroySession, hashText, isAuthenticated, passwordMatches } from "./_shared.mjs";
+import { constantTimeEqual, createSession, destroySession, hashText, isAuthenticated, isSameOrigin, passwordMatches } from "./_shared.mjs";
 
 class SessionDb {
   sessions = new Map();
@@ -44,4 +44,11 @@ test("creates, verifies, and destroys an opaque session", async () => {
   assert.equal(await isAuthenticated(request, env), true);
   await destroySession(request, env);
   assert.equal(await isAuthenticated(request, env), false);
+});
+
+test("accepts the public custom domain after internal dispatch", () => {
+  const request = new Request("https://polished-fediverse.spacefast.site/weight-notebook/api/session", {
+    headers: { origin: "https://spaces.briancoords.com" }
+  });
+  assert.equal(isSameOrigin(request), true);
 });

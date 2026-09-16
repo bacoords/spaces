@@ -41,7 +41,8 @@ export async function ensureSchema(env) {
 
 export function isSameOrigin(request) {
   const origin = request.headers.get("origin");
-  return Boolean(origin && origin === new URL(request.url).origin);
+  if (!origin) return false;
+  return origin === new URL(request.url).origin || origin === "https://spaces.briancoords.com";
 }
 
 function cookieValue(request, name) {
