@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A sample page for smooth scrolling</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f1e8;
+      --ink: #17211e;
+      --muted: #5c6862;
+      --accent: #176b5b;
+      --line: #d8d0c1;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.65;
+    }
+
+    .shell { width: min(calc(100% - 48px), 860px); margin: 0 auto; }
+
+    header {
+      min-height: 88vh;
+      display: grid;
+      align-content: center;
+      padding: 80px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 750;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.035em; }
+
+    h1 {
+      max-width: 11ch;
+      margin: 0 0 26px;
+      font-size: clamp(3rem, 10vw, 6.5rem);
+      line-height: .96;
+    }
+
+    .dek { max-width: 35rem; margin: 0; color: var(--muted); font-size: clamp(1.1rem, 2.2vw, 1.35rem); }
+
+    main { padding-bottom: 18vh; }
+
+    section {
+      min-height: 78vh;
+      display: grid;
+      grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr);
+      gap: 8vw;
+      align-content: center;
+      padding: 90px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .number { color: var(--accent); font-family: var(--serif); font-size: 1.1rem; }
+
+    h2 { max-width: 12ch; margin: 0; font-size: clamp(2.2rem, 5vw, 4.2rem); line-height: 1.03; }
+
+    .copy { max-width: 34rem; color: var(--muted); font-size: 1.05rem; }
+    .copy p { margin: 0 0 1.35em; }
+    .copy p:last-child { margin-bottom: 0; }
+
+    footer { padding: 90px 0; color: var(--muted); font-size: .9rem; }
+
+    @media (max-width: 650px) {
+      .shell { width: min(calc(100% - 32px), 860px); }
+      section { grid-template-columns: 1fr; gap: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <p class="eyebrow">Sample recording page</p>
+      <h1>Take the long way down.</h1>
+      <p class="dek">This page gives Smooth Scroll Studio enough room to demonstrate a calm, even recording pass.</p>
+    </header>
+
+    <main>
+      <section>
+        <div>
+          <span class="number">01</span>
+          <h2>Begin with stillness</h2>
+        </div>
+        <div class="copy">
+          <p>A short delay gives the recording a clean opening frame. Let the page settle before motion begins, especially when fonts, images, or interface elements load asynchronously.</p>
+          <p>Three seconds is usually enough room to trim the start of a take without feeling rushed.</p>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <span class="number">02</span>
+          <h2>Choose a human pace</h2>
+        </div>
+        <div class="copy">
+          <p>Slow scrolling gives the viewer time to read headings and understand the rhythm of a page. The best speed depends on density: visual pages can move faster, while articles need more breathing room.</p>
+          <p>Adjust the controller during a take if a long quiet section needs a little momentum.</p>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <span class="number">03</span>
+          <h2>Pause on the good parts</h2>
+        </div>
+        <div class="copy">
+          <p>Use the pause control whenever an important section enters the frame. The animation resumes from the exact same position and retains the selected speed.</p>
+          <p>For a clean capture, hide the control panel once the page and speed are set.</p>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <span class="number">04</span>
+          <h2>Finish with room to breathe</h2>
+        </div>
+        <div class="copy">
+          <p>The scroll stops automatically at the bottom of the page. Hold the final frame for a moment before ending the recording so the finish feels deliberate.</p>
+          <p>When you are ready for another take, return to the top and begin again.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>End of sample page · Smooth Scroll Studio</footer>
+  </div>
+</body>
+</html>

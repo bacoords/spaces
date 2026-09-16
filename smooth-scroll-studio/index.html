@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Load a webpage into a clean recording frame and scroll it at a steady, adjustable speed.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f141d'/%3E%3Cpath d='M32 13v34m0 0L20 35m12 12 12-12' fill='none' stroke='%2361d6c2' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <title>Smooth Scroll Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --canvas: #faf7f3;
+      --window: #0f141d;
+      --titlebar: #121923;
+      --panel: #0d121a;
+      --viewport: #101722;
+      --line: #202a38;
+      --text: #d7dee9;
+      --muted: #758194;
+      --faint: #485466;
+      --teal: #61d6c2;
+      --teal-bright: #7ce5d1;
+      --amber: #f5b97c;
+      --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+      --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow: auto;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: var(--ui);
+    }
+
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+
+    .stage {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .studio-layout {
+      position: relative;
+      width: 100%;
+      height: min(900px, calc(100vh - 48px));
+      min-height: 650px;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 52px;
+      align-items: stretch;
+    }
+
+    .browser-window {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--window);
+      border: 1px solid #293545;
+      border-radius: 14px;
+    }
+
+    .titlebar {
+      min-height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 2fr) 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 0 14px;
+      background: var(--titlebar);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .window-controls { display: flex; gap: 8px; align-items: center; }
+
+    .window-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+    }
+
+    .window-dot.red { background: #ff6b6b; }
+    .window-dot.yellow { background: #f7c75b; }
+    .window-dot.green { background: #5fd27a; }
+
+    .window-title {
+      min-width: 0;
+      overflow: hidden;
+      color: #aeb8c7;
+      font-family: var(--mono);
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .frame-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .icon-button {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .icon-button:hover { border-color: #354357; background: #182231; color: #fff; }
+
+    .frame-viewport {
+      position: relative;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .page-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+      transform: translate3d(0, 0, 0);
+      transform-origin: top left;
+      will-change: transform;
+    }
+
+    .browser-window.mimic-mode .page-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 7500px;
+    }
+
+    .loading-cover {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: none;
+      place-items: center;
+      background: var(--viewport);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+    }
+
+    .browser-window.is-loading .loading-cover { display: grid; }
+
+    .control-tray {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: end;
+      z-index: 4;
+      padding: 14px;
+      background: rgba(15, 20, 29, .97);
+      border: 1px solid #334154;
+      border-radius: 10px;
+      backdrop-filter: blur(14px);
+    }
+
+    .control-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .control-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #d6deea;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .control-title::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 11px rgba(97, 214, 194, .66);
+    }
+
+    .phase-label {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      white-space: nowrap;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+    }
+
+    .url-form {
+      margin-bottom: 13px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .url-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 7px;
+    }
+
+    .url-input {
+      width: 100%;
+      height: 34px;
+      min-width: 0;
+      padding: 0 9px;
+      color: #ced9e8;
+      background: #0b1018;
+      border: 1px solid #2d3a4b;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .control-button,
+    .small-button,
+    .speed-select {
+      min-height: 34px;
+      border: 1px solid #354357;
+      border-radius: 6px;
+      background: #182231;
+      color: #cbd6e4;
+      cursor: pointer;
+      font-size: 0.8125rem;
+      transition: background .16s ease, border-color .16s ease, color .16s ease;
+    }
+
+    .control-button,
+    .small-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-width: 0;
+      padding: 0 10px;
+    }
+
+    .control-button:hover,
+    .small-button:hover,
+    .speed-select:hover { background: #223044; border-color: #51637b; color: #fff; }
+
+    .control-button:disabled,
+    .small-button:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+
+    .control-button.primary {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #08201f;
+      font-weight: 700;
+    }
+
+    .control-button.primary:hover:not(:disabled) {
+      background: var(--teal-bright);
+      border-color: var(--teal-bright);
+    }
+
+    .play-icon { min-width: 11px; font-size: 0.75rem; line-height: 1; }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 7px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 94px;
+      gap: 10px;
+      margin-top: 13px;
+    }
+
+    .speed-field { min-width: 0; }
+
+    .speed-line {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .speed-line .field-label { margin: 0; }
+
+    .speed-value {
+      color: var(--teal);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      white-space: nowrap;
+    }
+
+    .speed-range {
+      width: 100%;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .speed-select {
+      width: 100%;
+      height: 34px;
+      padding: 0 7px;
+    }
+
+    .mimic-settings {
+      display: none;
+      margin-top: 13px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .mimic-settings.open { display: block; }
+
+    .progress-track {
+      height: 3px;
+      margin: 14px 0 12px;
+      overflow: hidden;
+      border-radius: 3px;
+      background: #253143;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--teal);
+      box-shadow: 0 0 10px rgba(97, 214, 194, .58);
+    }
+
+    .compatibility {
+      min-height: 36px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      line-height: 1.45;
+    }
+
+    .compatibility.warning { color: var(--amber); }
+
+    .control-bottomline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+    }
+
+    .keyboard-hint {
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+    }
+
+    .show-controls {
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      z-index: 4;
+      display: none;
+    }
+
+    .controls-hidden .control-tray { display: none; }
+    .controls-hidden .show-controls { display: inline-flex; }
+
+    @media (max-width: 800px) {
+      .stage { padding: 0; }
+
+      .studio-layout {
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(62vh, 620px) auto;
+        gap: 12px;
+      }
+
+      .browser-window {
+        min-height: 0;
+        grid-column: 1;
+        grid-row: 1;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .control-tray {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: stretch;
+        width: auto;
+        margin: 0 11px 13px;
+      }
+
+      .show-controls { left: 11px; bottom: 13px; }
+    }
+
+    @media (max-width: 520px) {
+      .titlebar { grid-template-columns: auto minmax(0, 1fr) auto; }
+      .settings-grid { grid-template-columns: minmax(0, 1fr) 88px; }
+      .keyboard-hint { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="studio-layout" id="studioLayout">
+      <section class="control-tray" aria-label="Smooth scroll controls">
+        <div class="control-topline">
+          <div class="control-title">Scroll sequence</div>
+          <div class="phase-label" id="phaseLabel">Ready</div>
+        </div>
+
+        <form class="url-form" id="urlForm">
+          <label class="field-label" for="urlInput">Page URL</label>
+          <div class="url-row">
+            <input class="url-input" id="urlInput" type="text" value="./sample-page.html" inputmode="url" autocomplete="url" spellcheck="false" aria-describedby="compatibilityMessage">
+            <button class="small-button" type="submit">Load</button>
+          </div>
+        </form>
+
+        <div class="control-row">
+          <button class="control-button primary" id="playButton" type="button"><span class="play-icon" id="playIcon">▶</span><span id="playLabel">Start scroll</span></button>
+          <button class="control-button" id="topButton" type="button">Top</button>
+          <button class="control-button" id="endButton" type="button">End</button>
+        </div>
+
+        <div class="settings-grid">
+          <div class="speed-field">
+            <div class="speed-line">
+              <label class="field-label" for="speedRange">Speed</label>
+              <output class="speed-value" id="speedValue" for="speedRange">80 px/s</output>
+            </div>
+            <input class="speed-range" id="speedRange" type="range" min="20" max="320" step="10" value="80">
+          </div>
+          <label>
+            <span class="field-label">Start delay</span>
+            <select class="speed-select" id="delaySelect" aria-label="Start delay">
+              <option value="0">None</option>
+              <option value="3" selected>3 sec</option>
+              <option value="5">5 sec</option>
+              <option value="10">10 sec</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mimic-settings" id="mimicSettings">
+          <div class="speed-line">
+            <label class="field-label" for="pageHeightRange">Page height</label>
+            <output class="speed-value" id="pageHeightValue" for="pageHeightRange">7,500 px</output>
+          </div>
+          <input class="speed-range" id="pageHeightRange" type="range" min="1500" max="30000" step="250" value="7500">
+        </div>
+
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+        <p class="compatibility" id="compatibilityMessage" aria-live="polite">Loading the sample page…</p>
+
+        <div class="control-bottomline">
+          <span class="keyboard-hint">space · start / pause</span>
+          <button class="small-button" id="hideButton" type="button">Hide panel</button>
+        </div>
+      </section>
+
+      <section class="browser-window is-loading" id="browserWindow" aria-label="Webpage recording frame">
+        <header class="titlebar">
+          <div class="window-controls" aria-hidden="true">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <div class="window-title" id="windowTitle">sample-page.html</div>
+          <div class="frame-actions">
+            <button class="icon-button" id="reloadButton" type="button" aria-label="Reload webpage" title="Reload webpage">↻</button>
+          </div>
+        </header>
+        <div class="frame-viewport" id="frameViewport">
+          <iframe class="page-frame" id="pageFrame" title="Loaded webpage preview" src="about:blank" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <div class="loading-cover" aria-hidden="true">Loading page…</div>
+        </div>
+      </section>
+
+      <button class="small-button show-controls" id="showControlsButton" type="button">Show controls</button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const studioLayout = document.getElementById('studioLayout');
+      const browserWindow = document.getElementById('browserWindow');
+      const frameViewport = document.getElementById('frameViewport');
+      const pageFrame = document.getElementById('pageFrame');
+      const urlForm = document.getElementById('urlForm');
+      const urlInput = document.getElementById('urlInput');
+      const playButton = document.getElementById('playButton');
+      const playIcon = document.getElementById('playIcon');
+      const playLabel = document.getElementById('playLabel');
+      const topButton = document.getElementById('topButton');
+      const endButton = document.getElementById('endButton');
+      const speedRange = document.getElementById('speedRange');
+      const speedValue = document.getElementById('speedValue');
+      const delaySelect = document.getElementById('delaySelect');
+      const mimicSettings = document.getElementById('mimicSettings');
+      const pageHeightRange = document.getElementById('pageHeightRange');
+      const pageHeightValue = document.getElementById('pageHeightValue');
+      const progressFill = document.getElementById('progressFill');
+      const phaseLabel = document.getElementById('phaseLabel');
+      const compatibilityMessage = document.getElementById('compatibilityMessage');
+      const windowTitle = document.getElementById('windowTitle');
+      const reloadButton = document.getElementById('reloadButton');
+      const hideButton = document.getElementById('hideButton');
+      const showControlsButton = document.getElementById('showControlsButton');
+
+      let compatible = false;
+      let phase = 'loading';
+      let scrollMode = 'native';
+      let mimicOffset = 0;
+      let frameId = null;
+      let countdownId = null;
+      let loadTimeoutId = null;
+      let loadGeneration = 0;
+      let countdownEndsAt = 0;
+      let remainingDelay = 0;
+      let previousTimestamp = 0;
+      let currentUrl = new URL('./sample-page.html', window.location.href);
+
+      function getNativeScrollContext() {
+        const frameWindow = pageFrame.contentWindow;
+        const frameDocument = pageFrame.contentDocument;
+        if (!frameWindow || !frameDocument) throw new Error('Frame is not available');
+        void frameDocument.documentElement.scrollHeight;
+        return { frameWindow, frameDocument };
+      }
+
+      function getNativeMaximumScroll(context) {
+        const body = context.frameDocument.body;
+        const root = context.frameDocument.documentElement;
+        const height = Math.max(
+          body ? body.scrollHeight : 0,
+          body ? body.offsetHeight : 0,
+          root.scrollHeight,
+          root.offsetHeight
+        );
+        return Math.max(0, height - context.frameWindow.innerHeight);
+      }
+
+      function getMaximumScroll() {
+        if (scrollMode === 'mimic') {
+          return Math.max(0, Number(pageHeightRange.value) - frameViewport.clientHeight);
+        }
+        return getNativeMaximumScroll(getNativeScrollContext());
+      }
+
+      function getScrollPosition() {
+        return scrollMode === 'mimic' ? mimicOffset : getNativeScrollContext().frameWindow.scrollY;
+      }
+
+      function setScrollPosition(position) {
+        const nextPosition = Math.min(getMaximumScroll(), Math.max(0, position));
+        if (scrollMode === 'mimic') {
+          mimicOffset = nextPosition;
+          pageFrame.style.transform = `translate3d(0, ${-nextPosition}px, 0)`;
+        } else {
+          getNativeScrollContext().frameWindow.scrollTo(0, nextPosition);
+        }
+        return nextPosition;
+      }
+
+      function setCompatibility(message, warning = false) {
+        compatibilityMessage.textContent = message;
+        compatibilityMessage.classList.toggle('warning', warning);
+      }
+
+      function setPhase(nextPhase) {
+        phase = nextPhase;
+        const labels = {
+          loading: 'Loading',
+          ready: scrollMode === 'mimic' ? 'Ready · mimic' : 'Ready',
+          countdown: 'Starting',
+          running: 'Scrolling',
+          paused: 'Paused',
+          done: 'Complete'
+        };
+        phaseLabel.textContent = labels[phase];
+        const isRunning = phase === 'running' || phase === 'countdown';
+        playIcon.textContent = isRunning ? 'Ⅱ' : '▶';
+        playLabel.textContent = phase === 'paused' ? 'Resume' : phase === 'done' ? 'Start again' : isRunning ? 'Pause' : 'Start scroll';
+      }
+
+      function updateControls() {
+        playButton.disabled = !compatible;
+        topButton.disabled = !compatible;
+        endButton.disabled = !compatible;
+      }
+
+      function updateProgress() {
+        if (!compatible) {
+          progressFill.style.width = '0%';
+          return;
+        }
+        try {
+          const maximum = getMaximumScroll();
+          const progress = maximum ? getScrollPosition() / maximum : 0;
+          progressFill.style.width = `${Math.min(100, Math.max(0, progress * 100))}%`;
+        } catch (error) {
+          progressFill.style.width = '0%';
+        }
+      }
+
+      function stopAnimation() {
+        if (frameId !== null) cancelAnimationFrame(frameId);
+        if (countdownId !== null) cancelAnimationFrame(countdownId);
+        frameId = null;
+        countdownId = null;
+        previousTimestamp = 0;
+      }
+
+      function resetFramePresentation() {
+        mimicOffset = 0;
+        browserWindow.classList.remove('mimic-mode');
+        mimicSettings.classList.remove('open');
+        pageFrame.style.height = '';
+        pageFrame.style.transform = 'translate3d(0, 0, 0)';
+        pageFrame.setAttribute('scrolling', 'auto');
+      }
+
+      function applyMimicHeight() {
+        const oldHeight = Number(pageFrame.style.height.replace('px', '')) || Number(pageHeightRange.value);
+        const oldMaximum = Math.max(0, oldHeight - frameViewport.clientHeight);
+        const keepAtEnd = oldMaximum > 0 && mimicOffset >= oldMaximum - 2;
+        pageFrame.style.height = `${pageHeightRange.value}px`;
+        pageHeightValue.textContent = `${Number(pageHeightRange.value).toLocaleString()} px`;
+        setScrollPosition(keepAtEnd ? getMaximumScroll() : mimicOffset);
+        updateProgress();
+      }
+
+      function activateNativeMode(context) {
+        scrollMode = 'native';
+        resetFramePresentation();
+        compatible = true;
+        setPhase('ready');
+        const maximum = getNativeMaximumScroll(context);
+        setCompatibility(maximum > 0 ? 'Ready for a smooth take.' : 'This page fits in the frame, so there is nothing to scroll.', maximum === 0);
+        context.frameWindow.addEventListener('scroll', updateProgress, { passive: true });
+        updateControls();
+        updateProgress();
+      }
+
+      function activateMimicMode(message = 'Mimic mode · use End, then adjust page height until the footer sits in frame.') {
+        scrollMode = 'mimic';
+        mimicOffset = 0;
+        browserWindow.classList.add('mimic-mode');
+        mimicSettings.classList.add('open');
+        pageFrame.setAttribute('scrolling', 'no');
+        compatible = true;
+        applyMimicHeight();
+        setPhase('ready');
+        setCompatibility(message);
+        updateControls();
+        updateProgress();
+      }
+
+      function animate(timestamp) {
+        if (phase !== 'running') return;
+        if (!previousTimestamp) previousTimestamp = timestamp;
+        const elapsed = Math.min(80, timestamp - previousTimestamp);
+        previousTimestamp = timestamp;
+
+        try {
+          const maximum = getMaximumScroll();
+          const nextPosition = Math.min(maximum, getScrollPosition() + Number(speedRange.value) * elapsed / 1000);
+          setScrollPosition(nextPosition);
+          updateProgress();
+
+          if (nextPosition >= maximum) {
+            setPhase('done');
+            frameId = null;
+            return;
+          }
+          frameId = requestAnimationFrame(animate);
+        } catch (error) {
+          stopAnimation();
+          activateMimicMode('Switched to mimic mode · calibrate the page height, then start again.');
+        }
+      }
+
+      function beginScrolling() {
+        remainingDelay = 0;
+        setPhase('running');
+        previousTimestamp = 0;
+        frameId = requestAnimationFrame(animate);
+      }
+
+      function runCountdown() {
+        if (phase !== 'countdown') return;
+        remainingDelay = Math.max(0, countdownEndsAt - performance.now());
+        phaseLabel.textContent = `Starting · ${Math.ceil(remainingDelay / 1000)}`;
+        if (remainingDelay <= 0) {
+          beginScrolling();
+          return;
+        }
+        countdownId = requestAnimationFrame(runCountdown);
+      }
+
+      function startWithDelay(delayMilliseconds) {
+        if (delayMilliseconds <= 0) {
+          beginScrolling();
+          return;
+        }
+        setPhase('countdown');
+        countdownEndsAt = performance.now() + delayMilliseconds;
+        remainingDelay = delayMilliseconds;
+        countdownId = requestAnimationFrame(runCountdown);
+      }
+
+      function togglePlayback() {
+        if (!compatible) return;
+        if (phase === 'running') {
+          stopAnimation();
+          setPhase('paused');
+          return;
+        }
+        if (phase === 'countdown') {
+          remainingDelay = Math.max(0, countdownEndsAt - performance.now());
+          stopAnimation();
+          setPhase('paused');
+          return;
+        }
+        if (phase === 'paused') {
+          startWithDelay(remainingDelay);
+          return;
+        }
+        if (phase === 'done') moveToTop();
+        startWithDelay(Number(delaySelect.value) * 1000);
+      }
+
+      function moveToTop() {
+        if (!compatible) return;
+        stopAnimation();
+        try {
+          setScrollPosition(0);
+          remainingDelay = 0;
+          setPhase('ready');
+          updateProgress();
+        } catch (error) {
+          activateMimicMode();
+        }
+      }
+
+      function moveToEnd() {
+        if (!compatible) return;
+        stopAnimation();
+        try {
+          setScrollPosition(getMaximumScroll());
+          remainingDelay = 0;
+          setPhase('ready');
+          updateProgress();
+        } catch (error) {
+          activateMimicMode();
+        }
+      }
+
+      function normalizeUrl(value) {
+        const trimmed = value.trim();
+        if (!trimmed) return null;
+        const looksRelative = /^(?:\.{0,2}\/|\/|#|\?)/.test(trimmed);
+        const withProtocol = looksRelative || /^[a-z][a-z\d+.-]*:/i.test(trimmed) ? trimmed : `https://${trimmed}`;
+        const parsed = new URL(withProtocol, window.location.href);
+        if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+        return parsed;
+      }
+
+      function loadPage(url, updateHistory = true) {
+        stopAnimation();
+        if (loadTimeoutId !== null) clearTimeout(loadTimeoutId);
+        loadGeneration += 1;
+        const thisLoad = loadGeneration;
+        compatible = false;
+        scrollMode = 'native';
+        resetFramePresentation();
+        setPhase('loading');
+        updateControls();
+        browserWindow.classList.add('is-loading');
+        setCompatibility('Loading page…');
+        currentUrl = url;
+        windowTitle.textContent = url.hostname + (url.pathname === '/' ? '' : url.pathname);
+        pageFrame.src = url.href;
+
+        loadTimeoutId = setTimeout(() => {
+          if (thisLoad !== loadGeneration || compatible) return;
+          browserWindow.classList.remove('is-loading');
+          activateMimicMode('Mimic mode is ready. If the frame stays blank, this site blocks embedding.');
+        }, 8000);
+
+        if (updateHistory) {
+          const params = new URLSearchParams(window.location.search);
+          params.set('url', url.href);
+          window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+        }
+      }
+
+      function inspectLoadedPage() {
+        let context;
+        try {
+          context = getNativeScrollContext();
+          const loadedUrl = context.frameWindow.location.href;
+          if (loadedUrl === 'about:blank' && currentUrl.href !== 'about:blank') return;
+        } catch (error) {
+          context = null;
+        }
+
+        if (loadTimeoutId !== null) clearTimeout(loadTimeoutId);
+        browserWindow.classList.remove('is-loading');
+        if (context) activateNativeMode(context);
+        else activateMimicMode();
+      }
+
+      urlForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const nextUrl = normalizeUrl(urlInput.value);
+        if (!nextUrl) {
+          setCompatibility('Enter a valid http or https URL.', true);
+          urlInput.focus();
+          return;
+        }
+        loadPage(nextUrl);
+      });
+
+      pageFrame.addEventListener('load', () => requestAnimationFrame(inspectLoadedPage));
+      playButton.addEventListener('click', togglePlayback);
+      topButton.addEventListener('click', moveToTop);
+      endButton.addEventListener('click', moveToEnd);
+      speedRange.addEventListener('input', () => { speedValue.textContent = `${speedRange.value} px/s`; });
+      pageHeightRange.addEventListener('input', applyMimicHeight);
+      reloadButton.addEventListener('click', () => loadPage(currentUrl));
+      hideButton.addEventListener('click', () => studioLayout.classList.add('controls-hidden'));
+      showControlsButton.addEventListener('click', () => studioLayout.classList.remove('controls-hidden'));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.target.closest('input, select, button')) return;
+        if (event.code === 'Space') {
+          event.preventDefault();
+          togglePlayback();
+        }
+        if (event.key.toLowerCase() === 'r') moveToTop();
+      });
+
+      const requestedUrl = new URLSearchParams(window.location.search).get('url');
+      const initialUrl = normalizeUrl(requestedUrl || './sample-page.html');
+      if (requestedUrl && initialUrl) urlInput.value = initialUrl.href;
+      updateControls();
+      speedValue.textContent = `${speedRange.value} px/s`;
+      pageHeightValue.textContent = `${Number(pageHeightRange.value).toLocaleString()} px`;
+      if (initialUrl) loadPage(initialUrl, Boolean(requestedUrl));
+    })();
+  </script>
+</body>
+</html>
