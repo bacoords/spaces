@@ -2,6 +2,9 @@ const copyButtons = document.querySelectorAll( '.copy-trigger' );
 const copyStatus = document.querySelector( '.copy-status' );
 const menuToggle = document.querySelector( '.menu-toggle' );
 const globalNavigation = document.querySelector( '.global-nav' );
+const promptTabs = Array.from( document.querySelectorAll( '.prompt-tab' ) );
+const promptPanels = Array.from( document.querySelectorAll( '.prompt-panel' ) );
+const promptCopyButton = document.querySelector( '.prompt-copy' );
 
 async function writeToClipboard( text ) {
 	if ( navigator.clipboard && window.isSecureContext ) {
@@ -63,6 +66,52 @@ async function copyPrompt( button ) {
 
 copyButtons.forEach( ( button ) => {
 	button.addEventListener( 'click', () => copyPrompt( button ) );
+} );
+
+function activatePromptTab( tab ) {
+	const targetId = tab.dataset.promptTarget;
+
+	promptTabs.forEach( ( promptTab ) => {
+		const isActive = promptTab === tab;
+		promptTab.classList.toggle( 'is-active', isActive );
+		promptTab.setAttribute( 'aria-selected', String( isActive ) );
+		promptTab.tabIndex = isActive ? 0 : -1;
+	} );
+
+	promptPanels.forEach( ( panel ) => {
+		panel.hidden = panel.id !== targetId;
+	} );
+
+	if ( promptCopyButton ) {
+		promptCopyButton.dataset.copyTarget = targetId;
+	}
+
+	if ( copyStatus ) {
+		copyStatus.textContent = 'Ready to copy';
+	}
+}
+
+promptTabs.forEach( ( tab, index ) => {
+	tab.addEventListener( 'click', () => activatePromptTab( tab ) );
+	tab.addEventListener( 'keydown', ( event ) => {
+		let nextIndex;
+
+		if ( event.key === 'ArrowRight' ) {
+			nextIndex = ( index + 1 ) % promptTabs.length;
+		} else if ( event.key === 'ArrowLeft' ) {
+			nextIndex = ( index - 1 + promptTabs.length ) % promptTabs.length;
+		} else if ( event.key === 'Home' ) {
+			nextIndex = 0;
+		} else if ( event.key === 'End' ) {
+			nextIndex = promptTabs.length - 1;
+		} else {
+			return;
+		}
+
+		event.preventDefault();
+		activatePromptTab( promptTabs[ nextIndex ] );
+		promptTabs[ nextIndex ].focus();
+	} );
 } );
 
 if ( menuToggle && globalNavigation ) {

@@ -65,29 +65,27 @@
           <div class="hero__actions">
             <a class="text-link" href="#use-ai">Explore AI in WordPress <span aria-hidden="true">↘</span></a>
           </div>
-          <p class="hero__note">Use it with any AI coding agent. No existing site required.</p>
+          <p class="hero__note">Use either prompt with any AI coding agent.</p>
         </div>
 
         <div class="prompt-card" id="get-started">
           <div class="prompt-card__header">
-            <span>Starter prompt</span>
+            <span>Choose a starting point</span>
             <span>Any AI agent</span>
           </div>
-          <pre id="starter-prompt" tabindex="0" aria-label="Starter prompt for an AI coding agent">Create a blank, persistent WordPress site for me on my computer using WordPress Playground CLI (@wp-playground/cli).
+          <div class="prompt-card__tabs" role="tablist" aria-label="Choose a WordPress starting point">
+            <button class="prompt-tab is-active" id="new-site-tab" type="button" role="tab" aria-selected="true" aria-controls="new-site-prompt" data-prompt-target="new-site-prompt">I need a new site</button>
+            <button class="prompt-tab" id="existing-site-tab" type="button" role="tab" aria-selected="false" aria-controls="existing-site-prompt" data-prompt-target="existing-site-prompt" tabindex="-1">I have a site</button>
+          </div>
+          <pre class="prompt-panel" id="new-site-prompt" role="tabpanel" tabindex="0" aria-labelledby="new-site-tab">I need a new WordPress site. Create a blank, persistent local site using WordPress Playground CLI.
 
-Work in a new, clearly named project directory and use the simplified start command:
-npx @wp-playground/cli@latest start
+Use the latest stable WordPress in a clearly named project directory. Open the site, confirm the front end and dashboard work, then tell me how to start and stop it. Do not add themes, plugins, sample content, or custom code yet.</pre>
+          <pre class="prompt-panel" id="existing-site-prompt" role="tabpanel" tabindex="0" aria-labelledby="existing-site-tab" hidden>I have a WordPress site. Help me connect it to my AI agent with the official WordPress MCP Adapter.
 
-Use the latest stable WordPress release and its default theme. Do not add sample content, plugins, themes, or custom code unless required to make the site run.
-
-When the site is ready:
-1. Confirm the dashboard and front end load.
-2. Tell me the local URL and how to open the dashboard.
-3. Tell me where the persistent site files live and how to start and stop the environment.
-4. Summarize what you created, then wait for my next instruction.</pre>
+Ask for the site URL and check its REST API index for /mcp/mcp-adapter-default-server. If the route is missing, check compatibility and give me safe installation and activation steps. Then help me configure the endpoint using an Application Password for a WordPress user with only the permissions needed. Verify the connection before making changes.</pre>
           <div class="prompt-card__footer">
             <span class="copy-status" aria-live="polite">Ready to copy</span>
-            <button class="prompt-copy copy-trigger" type="button" data-copy-target="starter-prompt">
+            <button class="prompt-copy copy-trigger" type="button" data-copy-target="new-site-prompt">
               <span>Copy prompt</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V4h12v12h-3M4 8h12v12H4z"/></svg>
             </button>
@@ -103,17 +101,14 @@ When the site is ready:
         </div>
         <div class="steps">
           <article>
-            <span class="step-number">External agents</span>
             <h3>AI that works with your site</h3>
             <p>Connect an AI agent to draft, organize, update, and manage your site through WordPress permissions and open interfaces like MCP.</p>
           </article>
           <article>
-            <span class="step-number">Inside WordPress</span>
             <h3>AI in the tools you already use</h3>
             <p>Bring AI into familiar editing and administration flows to help people create content and run their sites.</p>
           </article>
           <article>
-            <span class="step-number">For builders</span>
             <h3>An open foundation to extend</h3>
             <p>Use the Abilities API, agent skills, Playground CLI, and WP-CLI to build new AI workflows on WordPress.</p>
           </article>
@@ -278,14 +273,11 @@ When the site is ready:
     <section class="final-cta" aria-labelledby="final-title">
       <div class="final-cta__inner">
         <div>
-          <p class="kicker">Begin locally</p>
-          <h2 id="final-title">Start with an empty canvas.</h2>
-          <p>One prompt creates the space. What you make next is yours.</p>
+          <p class="kicker">Begin here</p>
+          <h2 id="final-title">Start where your site is.</h2>
+          <p>Create a new WordPress site or connect an agent to one you already have.</p>
         </div>
-        <button class="button copy-trigger" type="button" data-copy-target="starter-prompt">
-          <span>Copy the starter prompt</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V4h12v12h-3M4 8h12v12H4z"/></svg>
-        </button>
+        <a class="button" href="#get-started">Choose a prompt <span aria-hidden="true">↟</span></a>
       </div>
     </section>
   </main>

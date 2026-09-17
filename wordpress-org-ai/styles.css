@@ -382,8 +382,49 @@ pre {
   color: #c3c7ca;
 }
 
+.prompt-card__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-bottom: 1px solid #4b5258;
+}
+
+.prompt-tab {
+  min-height: 54px;
+  padding: 14px 20px;
+  border: 0;
+  background: transparent;
+  color: #c3c7ca;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.prompt-tab + .prompt-tab {
+  border-left: 1px solid #4b5258;
+}
+
+.prompt-tab:hover {
+  color: var(--white);
+}
+
+.prompt-tab[aria-selected="true"] {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.prompt-tab:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--white);
+  outline-offset: -4px;
+}
+
 .prompt-card pre {
   max-height: 470px;
+  min-height: 254px;
   margin: 0;
   padding: 28px 30px 34px;
   overflow: auto;
@@ -462,13 +503,6 @@ pre {
 
 .steps article:last-child {
   border-right: 0;
-}
-
-.step-number {
-  display: block;
-  margin-bottom: 58px;
-  color: var(--blue);
-  font-size: 14px;
 }
 
 .steps h3,
@@ -1076,7 +1110,14 @@ pre {
 
   .prompt-card pre {
     max-height: 430px;
+    min-height: 0;
     padding: 24px 20px 28px;
+    font-size: 13px;
+  }
+
+  .prompt-tab {
+    min-height: 50px;
+    padding-inline: 16px;
     font-size: 13px;
   }
 
@@ -1123,10 +1164,6 @@ pre {
 
   .steps article:last-child {
     border-bottom: 0;
-  }
-
-  .step-number {
-    margin-bottom: 30px;
   }
 
   .section-heading {
