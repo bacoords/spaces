@@ -12,6 +12,25 @@ This public repository is the source for Brian Coords' collection of small stati
 
 Spacefast is connected to the GitHub repository. A push to `origin/main` publishes the repository as a new production version. Treat the repository root as the publish root and the whole repository as one atomic site snapshot.
 
+## Directory listing policy
+
+The root `index.html` is a curated directory. Do not add a project to it unless Brian explicitly asks for that project to be listed. New spaces are unlisted by default, even when they are published and accessible at their direct folder URL. Keep the displayed count equal to the number of listed projects, not the number of project folders.
+
+Currently listed:
+
+- `code-editor-typing-demo/`
+- `smooth-scroll-studio/`
+
+Index ignore list (keep these projects off the root directory unless Brian explicitly asks to add one):
+
+- `iris-sweater-finder/`
+- `sock-a-polloza/`
+- `storefront-migration-explorer/`
+- `weight-notebook/`
+- `wordpress-org-ai/`
+
+When Brian asks to list a project, update `index.html`, its displayed count, and these lists. The ignore list controls directory visibility only; preserve the project folders and their direct URLs.
+
 ## Project layout
 
 Create every project as a self-contained top-level directory:
@@ -33,7 +52,7 @@ Follow these rules:
 
 - Use a short, descriptive, lowercase kebab-case folder name. The folder name becomes the public URL path, so do not rename it casually.
 - Every project must contain an `index.html` at its folder root.
-- Keep the root `index.html` directory accurate. Add, update, or remove its project entry and space count whenever the top-level project folders change.
+- Keep the root `index.html` directory aligned with the explicit listing policy above. Creating, updating, or removing a project folder does not by itself change the directory.
 - Keep each project's HTML, CSS, JavaScript, images, fonts, and other assets inside that project's folder.
 - Prefer relative asset and navigation URLs such as `./styles.css`, `assets/icon.svg`, and `../other-project/`. Root-absolute URLs such as `/styles.css` resolve from `spaces.briancoords.com`, not from the project folder, and usually break the project.
 - Configure frameworks and routers with the matching base path (`/<folder-name>/`) and commit static output that works from that path. This repository is for static hosting, not server-side runtimes.
