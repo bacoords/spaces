@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#243dc8">
-  <meta name="description" content="Find your Iris & Co. knit in three quick questions, then build a cart and check out on the store.">
+  <meta name="description" content="Find your Iris & Co. sweater in three quick questions and head straight to checkout.">
   <title>Find Your Knit — Iris &amp; Co.</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="preconnect" href="https://i0.wp.com">
   <link rel="preconnect" href="https://woo-demo-store-10-9.mystagingwebsite.com">
   <link rel="stylesheet" href="./styles.css">
@@ -14,93 +15,41 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="announcement">GOOD KNITS, GOOD COMPANY <span aria-hidden="true">✳</span> A LITTLE COLOR GOES A LONG WAY</div>
-
   <header class="site-header">
     <a class="brand" href="https://woo-demo-store-10-9.mystagingwebsite.com/" aria-label="Iris and Co. home">
       <img src="https://i0.wp.com/woo-demo-store-10-9.mystagingwebsite.com/wp-content/uploads/2025/12/Logo_black.png?w=901&amp;ssl=1" alt="Iris &amp; Co." width="901" height="226">
     </a>
-    <nav class="header-nav" aria-label="Main navigation">
-      <a href="#quiz">The quiz</a>
-      <a href="#edit">The knit edit</a>
-      <a class="shop-link" href="https://woo-demo-store-10-9.mystagingwebsite.com/shop/">Visit the shop <span aria-hidden="true">↗</span></a>
-    </nav>
-    <button class="cart-trigger" id="cart-trigger" type="button" aria-label="Open mini cart, 0 items">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 11h11.3l2-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
-      <span class="cart-count" id="cart-count">0</span>
-    </button>
+    <span class="header-label">THE SWEATER FINDER</span>
+    <a class="shop-link" href="https://woo-demo-store-10-9.mystagingwebsite.com/shop/">Visit the shop <span aria-hidden="true">↗</span></a>
   </header>
-
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> THE IRIS &amp; CO. KNIT EDIT</div>
-        <h1 id="hero-title">Your next favorite <em>sweater</em> starts here.</h1>
-        <p>A little quiz for finding the knit that feels like you. Pick your mood, choose your fit, and make it yours.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#quiz">Find my knit <span aria-hidden="true">↗</span></a>
-          <a class="text-link" href="#edit">Browse the edit <span aria-hidden="true">↘</span></a>
-        </div>
-        <div class="hero-note"><span class="note-spark" aria-hidden="true">✳</span> 3 quick questions <span aria-hidden="true">·</span> Real styles from the store</div>
-      </div>
-      <div class="hero-visual">
-        <img src="https://woo-demo-store-10-9.mystagingwebsite.com/wp-content/themes/purple/assets/images/orange-sweater.webp" alt="Model wearing a bright orange Iris &amp; Co. sweater" width="1600" height="1000">
-        <div class="hero-sticker" aria-hidden="true"><span>GOOD</span><span>KNIT</span><span>ENERGY</span><i>✳</i></div>
-        <div class="hero-caption">01 / YOUR KNIT STORY BEGINS</div>
-      </div>
-    </section>
-
-    <div class="ticker" aria-hidden="true"><span>COLOR FOR EVERY DAY</span><b>✳</b><span>SOFTNESS THAT STAYS</span><b>✳</b><span>KNITS MADE TO BE LIVED IN</span><b>✳</b><span>COLOR FOR EVERY DAY</span></div>
-
-    <section class="quiz-section" id="quiz" aria-labelledby="quiz-heading">
-      <div class="section-intro">
-        <p class="section-kicker">THE LITTLE KNIT QUIZ / 01</p>
-        <h2 id="quiz-heading">Which sweater is <em>right for you?</em></h2>
-        <p>Tell us what you love. We’ll find a knit from the live Iris &amp; Co. collection that fits your day.</p>
-      </div>
-      <div class="quiz-shell">
-        <div class="quiz-accent" aria-hidden="true"><span>✳</span><span>✳</span><span>✳</span></div>
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> THE IRIS &amp; CO. KNIT QUIZ</p>
+        <h1 id="hero-title">Which sweater is <em>right for you?</em></h1>
+        <p class="hero-intro">Three quick questions. One very good knit.</p>
         <div class="quiz-panel" id="quiz-panel" aria-live="polite">
           <div class="loading-state"><span class="loader" aria-hidden="true"></span><p>Gathering the good knits…</p></div>
         </div>
       </div>
-    </section>
-
-    <section class="result-section" id="result" aria-label="Your sweater recommendation" hidden></section>
-
-    <section class="edit-section" id="edit" aria-labelledby="edit-heading">
-      <div class="edit-heading-wrap">
-        <div>
-          <p class="section-kicker">THE KNIT EDIT / 02</p>
-          <h2 id="edit-heading">More to <em>love.</em></h2>
-        </div>
-        <p>Great chemistry comes in more than one color. Explore the styles behind your match and add another to your mini cart.</p>
+      <div class="hero-visual">
+        <img id="hero-photo" src="https://woo-demo-store-10-9.mystagingwebsite.com/wp-content/themes/purple/assets/images/orange-sweater.webp" alt="Model wearing a bright orange Iris &amp; Co. sweater" width="1600" height="1000">
+        <div class="hero-sticker" aria-hidden="true"><span>GOOD</span><span>KNIT</span><span>ENERGY</span><i>✳</i></div>
+        <div class="hero-caption" id="hero-caption">A LITTLE COLOR GOES A LONG WAY</div>
       </div>
-      <div class="product-grid" id="product-grid" aria-live="polite">
-        <div class="product-skeleton"></div><div class="product-skeleton"></div><div class="product-skeleton"></div>
-      </div>
-    </section>
-
-    <section class="closing-banner" aria-label="Checkout note">
-      <div class="closing-icon" aria-hidden="true">✳</div>
-      <div><p class="section-kicker">FROM THE QUIZ TO YOUR CLOSET</p><h2>Find it. Love it. <em>Wear it on repeat.</em></h2></div>
-      <button class="button button-light" id="closing-cart" type="button">View my mini cart <span aria-hidden="true">↗</span></button>
     </section>
   </main>
-
   <footer class="site-footer">
-    <a class="footer-brand" href="https://woo-demo-store-10-9.mystagingwebsite.com/">IRIS &amp; CO.</a>
-    <span>Colorful knits, crafted to last.</span>
+    <span>IRIS &amp; CO. <span class="footer-divider">✳</span> Colorful knits, crafted to last.</span>
     <a href="https://woo-demo-store-10-9.mystagingwebsite.com/size-guide/">Size guide <span aria-hidden="true">↗</span></a>
   </footer>
-
-  <dialog class="cart-dialog" id="cart-dialog" aria-labelledby="cart-title">
-    <div class="cart-head">
-      <div><p class="section-kicker">YOUR LITTLE LINEUP</p><h2 id="cart-title">Mini cart <span id="cart-heading-count">(0)</span></h2></div>
-      <button class="icon-button" id="cart-close" type="button" aria-label="Close mini cart">×</button>
+  <aside class="checkout-dock" aria-label="Selected sweaters">
+    <div class="dock-inner">
+      <div class="dock-heading"><strong>YOUR PICKS <span id="pick-count">(0)</span></strong><span id="dock-label">Your sweaters will appear here.</span></div>
+      <div class="dock-picks" id="dock-picks" aria-live="polite"><span class="dock-empty" aria-hidden="true">✳</span></div>
+      <div class="dock-action" id="dock-action"><button class="button checkout-button" type="button" disabled>Checkout ↗</button></div>
     </div>
-    <div class="cart-items" id="cart-items"></div>
-    <div class="cart-foot" id="cart-foot"></div>
-  </dialog>
+  </aside>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
